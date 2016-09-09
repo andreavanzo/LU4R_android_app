@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="@string/connectivityPreferences"
+        android:key="pref_connectivity_settings">
+        <EditTextPreference
+            android:id="@+id/address"
+            android:key="ip_address"
+            android:title="@string/ip_address"
+            android:summary="Set the robot IP address"
+            android:inputType="phone"
+            android:defaultValue="127.0.0.1" />
+        <EditTextPreference
+            android:id="@+id/port"
+            android:key="port"
+            android:title="@string/port"
+            android:summary="Set the listening port"
+            android:inputType="number"
+            android:defaultValue="4567" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Connection type"
+        android:key="connection">
+        <ListPreference
+            android:id="@+id/connection"
+            android:key="connection"
+            android:title="Connection"
+            android:summary="Select the communication type"
+            android:entries="@array/connection_array"
+            android:entryValues="@array/connection_values"
+            android:defaultValue="wifi"/>
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="Proxemics"
+        android:key="pref_prox_settings">
+        <ListPreference
+            android:id="@+id/environment_spinner"
+                android:key="environment_spinner"
+                android:title="Environment"
+                android:summary="Select the environment of the robot"
+                android:entries="@array/environment_array"
+                android:entryValues="@array/environment_values"
+                android:defaultValue="corridor" />
+        <ListPreference
+                android:id="@+id/proxemics_spinner"
+                android:key="proxemics_spinner"
+                android:title="Distance"
+                android:summary="Select the distance of the robot from the person"
+                android:entries="@array/proxemics_array"
+                android:entryValues="@array/proxemics_values"
+                android:defaultValue="intimate" />
+        <ListPreference
+                android:id="@+id/position_spinner"
+                android:key="position_spinner"
+                android:title="Position"
+                android:summary="Select the position of the robot"
+                android:entries="@array/position_array"
+                android:entryValues="@array/position_values"
+                android:defaultValue="center" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Speech Mode"
+        android:key="SpeechMode">
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="ContinuousVsPush"
+            android:summary="If true, continuous listening is enabled (PocketSphinx). If false, push to talk is enabled."
+            android:title="Push-To-Talk/Continuous" />
+
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="PushVsClick"
+            android:summary="If true, push to talk is enabled, otherwise it is necessary to click the button once to start, and once to stop the recording."
+            android:title="Push/Click" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Speech API"
+        android:key="GoogleSettings">
+        <ListPreference
+            android:defaultValue="-1"
+            android:entries="@array/LanguageListHuman"
+            android:entryValues="@array/LanguageListProgram"
+            android:key="LanguageList"
+            android:title="Speech language"
+            android:summary="Speech recognizer: %s"/>
+
+        <ListPreference
+            android:id="@+id/tts_language"
+            android:key="tts_language"
+            android:title="TTS language"
+            android:summary="Speech synthesizer: %s"
+            android:entries="@array/language_array"
+            android:entryValues="@array/language_values"
+            android:defaultValue="default" />
+
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="OfflinePreferred"
+            android:summary="Use Google Offline API.\nNB: Chosen language must be installed on the system."
+            android:title="Offline Mode" />
+
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="WifiOnly"
+            android:summary="If disabled, the speech recognition will use 3G/4G data connection as well."
+            android:title="Use only Wifi" />
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="DebugEnabled"
+            android:summary="Show error messages."
+            android:title="Activate Debug Mode" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="PocketSphinx API"
+        android:key="SphinxSettings">
+
+        <CheckBoxPreference
+            android:key="checkbox_preference"
+            android:title="Log raw recordings"
+            android:summary="Warning: Takes lots of space on the device!"
+            android:defaultValue="false"/>
+
+        <it.uniroma1.android.fragments.settings.KeywordShowPreference
+            android:title="Keyword List"
+            android:summary="Shows keywords and relative threshold." />
+
+        <it.uniroma1.android.fragments.settings.KeywordAddPreference
+            android:defaultValue="0"
+            android:dialogMessage="@string/settings_dialog_message"
+            android:key="SEEKBAR_VALUE"
+            android:max="50"
+            android:text="@string/settings_unit"
+            android:title="Add Keyword" />
+
+
+        <it.uniroma1.android.fragments.settings.KeywordRemovePreference
+            android:key="removeKeyChecklist"
+            android:title="Remove Keyword"
+            android:dialogTitle="Remove Keyword"
+            android:persistent="false"
+            android:positiveButtonText="Ok"
+            android:negativeButtonText="Cancel"
+            />
+
+        <it.uniroma1.android.fragments.settings.KeywordResetPreference
+            android:key="resetKey"
+            android:dialogIcon="@android:drawable/ic_dialog_alert"
+            android:title="Reset Keywords"
+            android:summary="Revert to the standard keyword list."
+            android:dialogMessage="Are you sure you wish to reset your keyword list? This action cannot be undone!"
+            android:positiveButtonText="Reset"
+            android:negativeButtonText="Cancel"/>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

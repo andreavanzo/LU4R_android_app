@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Robot Interface</string>
+    <string name="title_section1">Home</string>
+    <string name="title_section2">Joypad</string>
+    <string name="title_section3">Speech interface</string>
+    <string name="title_section4">Dialogue interface</string>
+    <string name="title_section5">NLP chain</string>
+    <string name="title_section6">Questionnaire</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="connect">Connect</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="action_settings">Settings</string>
+    <string name="blue_device">Connect to a device</string>
+    <string name="speech_prompt">Say something&#8230;</string>
+    <string name="speech_not_supported">Sorry! Your device doesn\'t support speech input</string>
+    <string name="button_content">Button to start speaking</string>
+    <string name="ok">Ok</string>
+    <string name="cancel">Cancel</string>
+    <string name="connect_message">Connect to robot</string>
+    <string name="ip_address">IP address</string>
+    <string name="port">Port</string>
+    <string name="hypoTitle">Hypotheses list:</string>
+    <string name="robotSaidTitle">Robot said:</string>
+    <string name="youSaidTitle">You said:</string>
+    <string name="connectivityPreferences">Connectivity</string>
+    <string name="speechPreferences">Speech</string>
+    <string name="command">Command</string>
+    <string name="question_text">Thank you for your contribution to this experiment! I would like to ask you a couple of questions. Please, try to be honest! Push the button to start...</string>
+    <string-array name="environment_array">
+        <item>Corridor</item>
+        <item>Outside elevator</item>
+        <item>Inside elevator</item>
+        <item>Coffee machine</item>
+        <item>Printer</item>
+    </string-array>
+    <string-array name="environment_values">
+        <item>corridor</item>
+        <item>outside</item>
+        <item>inside</item>
+        <item>coffee</item>
+        <item>printer</item>
+    </string-array>
+    <string-array name="proxemics_array">
+        <item>Intimate</item>
+        <item>Personal</item>
+        <item>Social</item>
+        <item>Collective</item>
+    </string-array>
+    <string-array name="proxemics_values">
+        <item>intimate</item>
+        <item>personal</item>
+        <item>social</item>
+        <item>collective</item>
+    </string-array>
+    <string-array name="position_array">
+        <item>Left</item>
+        <item>Center</item>
+        <item>Right</item>
+    </string-array>
+    <string-array name="position_values">
+        <item>left</item>
+        <item>center</item>
+        <item>right</item>
+    </string-array>
+    <string-array name="language_array">
+        <item>Default</item>
+        <item>English</item>
+        <item>Italian</item>
+        <item>French</item>
+        <item>Spanish</item>
+        <item>German</item>
+    </string-array>
+    <string-array name="language_values">
+        <item>default</item>
+        <item>en_GB</item>
+        <item>it</item>
+        <item>fr</item>
+        <item>es</item>
+        <item>de</item>
+    </string-array>
+    <string-array name="connection_array">
+        <item>TCP WiFi</item>
+        <item>Bluetooth</item>
+    </string-array>
+    <string-array name="connection_values">
+        <item>wifi</item>
+        <item>blue</item>
+    </string-array>
+    <!--  DeviceListActivity -->
+    <string name="scanning">scanning for devices...</string>
+    <string name="select_device">select a device to connect</string>
+    <string name="none_paired">No devices have been paired</string>
+    <string name="none_found">No devices found</string>
+    <string name="title_paired_devices">Paired Devices</string>
+    <string name="title_other_devices">Other Available Devices</string>
+    <string name="button_scan">Scan for devices</string>
+
+<!--Added for Speech Fragment-->
+    <string name="title_activity_settings">Settings</string>
+
+    <string-array name="LanguageListHuman">
+        <item>English (US)</item>
+        <item>English (UK)</item>
+        <item>French</item>
+        <item>German</item>
+        <item>Italian</item>
+        <item>Spanish</item>
+    </string-array>
+    <string-array name="LanguageListProgram">
+        <item>-1</item>
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+    </string-array>
+
+
+    <string name="textview_text">SeekBarPreference test</string>
+
+    <string name="menu_settings">Settings</string>
+    <string name="settings_dialog_message">Select a keyword or keyphrase and the threshold.\nThe threshold can go from 0 to 50, where 0 is the highest value.\nIf the keyword is not present in the dictionary it will be skipped.</string>
+    <string name="settings_unit"></string>
+    <string name="settings_title">Select keyword and threshold</string>
+</resources>

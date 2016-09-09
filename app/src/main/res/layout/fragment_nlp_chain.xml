@@ -1,0 +1,44 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="it.uniroma1.android.fragments.NLPChainFragment">
+
+    <TextView
+        android:id="@+id/commandTitle"
+        android:layout_width="250dp"
+        android:layout_height="50dp"
+        android:textColor="@android:color/black"
+        android:layout_gravity="center_horizontal|top"
+        android:textSize="20dp"
+        android:layout_marginTop="200dp" />
+
+    <TextView
+        android:id="@+id/commandContent"
+        android:layout_width="280dp"
+        android:layout_height="200dp"
+        android:layout_marginTop="255dp"
+        android:textColor="@android:color/black"
+        android:textSize="20sp"
+        android:textStyle="normal"
+        android:layout_gravity="center_horizontal|top" />
+
+    <TextView
+        android:id="@+id/youSaidTitle"
+        android:layout_width="250dp"
+        android:layout_height="50dp"
+        android:textColor="@android:color/black"
+        android:layout_gravity="center_horizontal|top"
+        android:textSize="20dp"
+        android:layout_marginTop="40dp" />
+
+    <TextView
+        android:id="@+id/youSaidContent"
+        android:layout_width="300dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="100dp"
+        android:textColor="@android:color/black"
+        android:textSize="20sp"
+        android:textStyle="normal"
+        android:layout_gravity="center_horizontal|top" />
+
+</FrameLayout>

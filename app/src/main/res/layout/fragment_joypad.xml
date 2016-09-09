@@ -1,0 +1,65 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+    <LinearLayout
+        android:id="@+id/linearLayout1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="10dp"
+        android:orientation="vertical" >
+        <TextView
+            android:id="@+id/x"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="X"
+            android:textColor="#444444"
+            android:textSize="18dp" />
+        <TextView
+            android:id="@+id/y"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Y"
+            android:textColor="#444444"
+            android:textSize="18dp" />
+        <TextView
+            android:id="@+id/angle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Angle"
+            android:textColor="#444444"
+            android:textSize="18dp" />
+        <TextView
+            android:id="@+id/distance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Distance"
+            android:textColor="#444444"
+            android:textSize="18dp" />
+        <TextView
+            android:id="@+id/normalizedDistance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Normalized distance"
+            android:textColor="#444444"
+            android:textSize="18dp" />
+        <TextView
+            android:id="@+id/direction"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Direction"
+            android:textColor="#444444"
+            android:textSize="18dp" />
+    </LinearLayout>
+    <RelativeLayout
+        android:id="@+id/layout_joystick"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_below="@+id/linearLayout1"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="29dp"
+        android:background="@drawable/image_button_bg" >
+    </RelativeLayout>
+</RelativeLayout>

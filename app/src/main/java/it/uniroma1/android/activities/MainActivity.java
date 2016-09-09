@@ -50,8 +50,14 @@ public class MainActivity extends FragmentActivity implements NavigationDrawerFr
     private static Locale speechLanguage = Locale.getDefault();
     private static TextToSpeech tts = null;
     private static String activeFragment = "";
-    private static String environment = "corridor", proxemics = "intimate", proxemicsAngle = "center";
     private static String connectionType = "wifi";
+    private static boolean continuousActive = true;
+    private static boolean push = false;
+    private static boolean wifiOnly = true;
+    private static boolean offlinePref = true;
+    private static String lang = "-1";
+    private static boolean logRecord = false;
+    private static boolean debugEnabled = false;
     private BluetoothConnectionService bcs = null;
     protected PowerManager.WakeLock mWakeLock;
 
@@ -215,19 +221,13 @@ public class MainActivity extends FragmentActivity implements NavigationDrawerFr
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             Toast.makeText(this, item.getTitle(), Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -239,17 +239,25 @@ public class MainActivity extends FragmentActivity implements NavigationDrawerFr
         getWindow().setAttributes(lp);
     }
 
-    private class PreferenceChangeListener implements
-            SharedPreferences.OnSharedPreferenceChangeListener {
+    private class PreferenceChangeListener implements SharedPreferences.OnSharedPreferenceChangeListener {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
             applySingleSetting(key);
         }
     }
 
+    @Override
+    public void onBackPressed() {
+
+    }
     public void applyAllSettings() {
         ip_address = sharedPref.getString("ip_address", "127.0.0.1");
         port = Integer.parseInt(sharedPref.getString("port", "4567"));
+        connectionType = sharedPref.getString("connection", "wifi");
+
+        continuousActive = sharedPref.getBoolean("continuous_speech", true);
+        push = sharedPref.getBoolean("push_settings", true);
+
         String tempLanguage = sharedPref.getString("speech_language", "default");
         if (tempLanguage.equals("default"))
             speechLanguage = Locale.getDefault();
@@ -260,13 +268,18 @@ public class MainActivity extends FragmentActivity implements NavigationDrawerFr
             tts.setLanguage(Locale.getDefault());
         else
             tts.setLanguage(new Locale(tempLanguage));
-        System.out.println(ip_address);
-        System.out.println(port);
-        System.out.println(speechLanguage);
-        System.out.println(tts.getLanguage());
+        offlinePref = sharedPref.getBoolean("offline_speech", true);
+        wifiOnly = sharedPref.getBoolean("wifi_speech", true);
+        debugEnabled = sharedPref.getBoolean("debug_speech", false);
+
+        logRecord = sharedPref.getBoolean("recording_preference", false);
+        lang = sharedPref.getString("LanguageList", "-1");
+
+
     }
 
     public void applySingleSetting(String key) {
+        System.out.println(key);
         switch (key) {
             case "ip_address":
                 ip_address = sharedPref.getString(key, "127.0.0.1");
@@ -275,6 +288,15 @@ public class MainActivity extends FragmentActivity implements NavigationDrawerFr
             case "port":
                 port = Integer.parseInt(sharedPref.getString(key, "4567"));
                 System.out.println(port);
+                break;
+            case "connection":
+                connectionType = sharedPref.getString("connection", "wifi");
+                break;
+            case "continuous_speech":
+                continuousActive = sharedPref.getBoolean("continuous_speech", true);
+                break;
+            case "push_settings":
+                push = sharedPref.getBoolean("push_settings", true);
                 break;
             case "speech_language":
                 String tempLanguage = sharedPref.getString(key, "default");
@@ -292,17 +314,20 @@ public class MainActivity extends FragmentActivity implements NavigationDrawerFr
                     tts.setLanguage(new Locale(ttsLanguage));
                 System.out.println(tts.getLanguage());
                 break;
-            case "environment_spinner":
-                environment = sharedPref.getString("environment_spinner", "corridor");
+            case "offline_speech":
+                offlinePref = sharedPref.getBoolean("offline_speech", true);
                 break;
-            case "proxemics_spinner":
-                proxemics = sharedPref.getString("proxemics_spinner", "intimate");
+            case "wifi_speech":
+                wifiOnly = sharedPref.getBoolean("wifi_speech", true);
                 break;
-            case "position_spinner":
-                proxemicsAngle = sharedPref.getString("position_spinner", "center");
+            case "debug_speech":
+                debugEnabled = sharedPref.getBoolean("debug_speech", false);
                 break;
-            case "connection":
-                connectionType = sharedPref.getString("connection", "wifi");
+            case "recording_preference":
+                logRecord = sharedPref.getBoolean("recording_preference", false);
+                break;
+            case "LanguageList":
+                lang = sharedPref.getString("LanguageList", "-1");
                 break;
         }
     }
@@ -323,29 +348,46 @@ public class MainActivity extends FragmentActivity implements NavigationDrawerFr
         return port;
     }
 
-    public Locale getSpeechLanguage() {
-        return speechLanguage;
+    public String getConnectionType() {
+        return connectionType;
+    }
+
+    public boolean getContinuousActive() {
+        return continuousActive;
+    }
+
+    public boolean getPush() {
+        return push;
+    }
+
+    public boolean getOfflinePref() {
+        return offlinePref;
+    }
+
+    public boolean getWifiOnly() {
+        return wifiOnly;
+    }
+
+    public boolean getDebugEnabled() {
+        return debugEnabled;
+    }
+
+    public boolean getLogRecord() {
+        return logRecord;
+    }
+
+    public String getLang() {
+        return lang;
     }
 
     public TextToSpeech getTTS() {
         return tts;
     }
 
-    public String getEnvironment() {
-        return environment;
+    public Locale getSpeechLanguage() {
+        return speechLanguage;
     }
 
-    public String getProxemics() {
-        return proxemics;
-    }
-
-    public String getProxemicsAngle() {
-        return proxemicsAngle;
-    }
-
-    public String getConnectionType() {
-        return connectionType;
-    }
 
     public SharedPreferences getSharedPref() {
         return sharedPref;

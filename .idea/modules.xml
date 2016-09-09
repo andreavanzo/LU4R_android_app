@@ -3,7 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/robot_interface-bluetooth-communication.iml" filepath="$PROJECT_DIR$/robot_interface-bluetooth-communication.iml" />
+      <module fileurl="file://$PROJECT_DIR$/robot_interface.iml" filepath="$PROJECT_DIR$/robot_interface.iml" />
     </modules>
   </component>
 </project>

@@ -3,12 +3,10 @@ package it.uniroma1.android.fragments;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.NotificationManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
@@ -22,12 +20,8 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.speech.RecognitionListener;
-import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
-import android.speech.tts.TextToSpeech;
 import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
@@ -40,18 +34,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
 
-import edu.cmu.pocketsphinx.Hypothesis;
 import it.uniroma1.android.R;
 import it.uniroma1.android.activities.MainActivity;
-import it.uniroma1.android.fragments.speechAPI.PocketSphinx;
-import it.uniroma1.android.fragments.speechAPI.PushToTalk;
+import it.uniroma1.android.fragments.speechAPI.PocketSphinxAPI;
+import it.uniroma1.android.fragments.speechAPI.GoogleSpeechAPI;
 import it.uniroma1.android.utils.FloatingActionButton;
 
 import static android.widget.Toast.makeText;
-import static edu.cmu.pocketsphinx.SpeechRecognizerSetup.defaultSetup;
 
 /**
  * A {@link Fragment} that creates two Speech Listener interfaces to be used by the user.<p/>
@@ -100,8 +90,8 @@ public class SpeechInterfaceFragment extends Fragment {
     private boolean _debugEnabled=false;
 
     //ProgramModes
-    private PushToTalk pushy;
-    private PocketSphinx pocket;
+    private GoogleSpeechAPI googleSpeechAPI;
+    private PocketSphinxAPI pocketSphinxAPI;
 
     public static SpeechInterfaceFragment newInstance(int sectionNumber) {
         SpeechInterfaceFragment fragment = new SpeechInterfaceFragment();
@@ -113,278 +103,6 @@ public class SpeechInterfaceFragment extends Fragment {
 
     public SpeechInterfaceFragment() {}
 
-    /*Old code*/
-/*    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        System.out.println("onCreate");
-        super.onCreate(savedInstanceState);
-        defaultRecognizer = SpeechRecognizer.createSpeechRecognizer(getActivity(), ComponentName.unflattenFromString("com.google.android.googlequicksearchbox/com.google.android.voicesearch.serviceapi.GoogleRecognitionService"));
-        defaultRecognizer.setRecognitionListener(new RecognitionListener() {
-            @Override
-            public void onBeginningOfSpeech() {
-                System.out.println("Speech onBeginningOfSpeech");
-            }
-
-            @Override
-            public void onBufferReceived(byte[] buffer) {
-                System.out.println("Speech onBufferReceived");
-            }
-
-            @Override
-            public void onEndOfSpeech() {
-                System.out.println("Speech onEndOfSpeech");
-            }
-
-            @Override
-            public void onError(int error) {
-                System.out.println("Speech onError: " + error);
-                //TODO
-                //switchSearch(KWS_SEARCH);
-
-            }
-
-            @Override
-            public void onEvent(int eventType, Bundle params) {
-                System.out.println("Speech onEvent");
-            }
-
-            @Override
-            public void onPartialResults(Bundle partialResults) {
-                System.out.println("Speech onPartialResults");
-            }
-
-            @Override
-            public void onReadyForSpeech(Bundle params) {
-                System.out.println("Speech onReadyForSpeech");
-            }
-
-
-            @Override
-            public void onResults(Bundle results) {
-
-                String hypoToSend = "{\"hypotheses\":[";
-                ArrayList<String> strlist = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-                String hypoResults = "";
-                String hypo;
-                for (int i=0; i<strlist.size(); i++) {
-                    hypo = strlist.get(i);
-                    hypoResults += hypo + "\n";
-                    hypoToSend += "{\"transcription\":\"" + hypo + "\",\"confidence\":0.0,\"rank\":0}";
-                    if (i != strlist.size() - 1) {
-                        hypoToSend += ",";
-                    } else {
-                        hypoToSend += "]}";
-                    }
-                }
-                hypothesesContent.setText(strlist.get(0));
-                if (((MainActivity) getActivity()).getClient().isConnected()) {
-                    ((MainActivity) getActivity()).getClient().send(hypoToSend);
-                    //String robotResponse = ((MainActivity) getActivity()).getClient().readResponse();
-                    //robotResponse = robotResponse.replaceAll("\\|", "\n").replaceAll(" ", "\t");
-                    //commandContent.setText(robotResponse);
-                    *//*if (robotResponse.contains("Taking")) {
-                        ((MainActivity) getActivity()).getTTS().speak("Okay, I'm going to take the book that is on the table.", TextToSpeech.QUEUE_FLUSH, null);
-                        robotResponse = ((MainActivity) getActivity()).getClient().readResponse();
-                        if (robotResponse.contains("DON"))
-                            ((MainActivity) getActivity()).getTTS().speak("Please, could you put the book on my tray? Thank you!", TextToSpeech.QUEUE_FLUSH, null);
-                    } else if (robotResponse.contains("Bringing")) {
-                        if (robotResponse.contains("Lab1")) {
-                            ((MainActivity) getActivity()).getTTS().speak("Okay, I'm going to bring the book to the table of the laboratory.", TextToSpeech.QUEUE_FLUSH, null);
-                            robotResponse = ((MainActivity) getActivity()).getClient().readResponse();
-                            if (robotResponse.contains("DON")) {
-                                ((MainActivity) getActivity()).getTTS().speak("Please, could you put the book on my tray? Thank you!", TextToSpeech.QUEUE_FLUSH, null);
-                                robotResponse = ((MainActivity) getActivity()).getClient().readResponse();
-                                if (robotResponse.contains("DON"))
-                                    ((MainActivity) getActivity()).getTTS().speak("Please, could you put this book on the table? Thank you!", TextToSpeech.QUEUE_FLUSH, null);
-                            }
-                        } else if (robotResponse.contains("Lab2")) {
-                            ((MainActivity) getActivity()).getTTS().speak("Okay, I'm going to bring the book to the laboratory.", TextToSpeech.QUEUE_FLUSH, null);
-                            robotResponse = ((MainActivity) getActivity()).getClient().readResponse();
-                            if (robotResponse.contains("DON")) {
-                                ((MainActivity) getActivity()).getTTS().speak("Please, could you put the book on my tray? Thank you!", TextToSpeech.QUEUE_FLUSH, null);
-                                robotResponse = ((MainActivity) getActivity()).getClient().readResponse();
-                                if (robotResponse.contains("DON"))
-                                    ((MainActivity) getActivity()).getTTS().speak("Please, could you remove the book from my tray? Thank you!", TextToSpeech.QUEUE_FLUSH, null);
-                            }
-                        } else {
-                            ((MainActivity) getActivity()).getTTS().speak("Okay, I'm going to bring the book to the table.", TextToSpeech.QUEUE_FLUSH, null);
-                            robotResponse = ((MainActivity) getActivity()).getClient().readResponse();
-                            if (robotResponse.contains("DON")) {
-                                ((MainActivity) getActivity()).getTTS().speak("Please, could you put the book on my tray? Thank you!", TextToSpeech.QUEUE_FLUSH, null);
-                                robotResponse = ((MainActivity) getActivity()).getClient().readResponse();
-                                if (robotResponse.contains("DON"))
-                                    ((MainActivity) getActivity()).getTTS().speak("Please, could you put this book on the table? Thank you!", TextToSpeech.QUEUE_FLUSH, null);
-                            }
-                        }
-                    }*//*
-                    *//*if (robotResponse.contains("[SAY]")) {
-                        if (robotResponse.contains("[COMMAND]")) {
-                            String[] splitted = robotResponse.split("\\|");
-                            ((MainActivity) getActivity()).getTTS().speak(splitted[0].replaceAll("\\[SAY\\]", ""), TextToSpeech.QUEUE_FLUSH, null);
-                            commandContent.setText(splitted[1].replaceAll("\\[COMMAND\\]", ""));
-                        } else {
-                            ((MainActivity) getActivity()).getTTS().speak(robotResponse.replaceAll("\\[SAY\\]", ""), TextToSpeech.QUEUE_FLUSH, null);
-                        }
-                    } else {
-                        commandContent.setText(robotResponse);
-                    }*(
-
-                    *//*TextView robotText = (TextView) view.findViewById(R.id.robotSaidContent);
-
-                    robotText.setText(robotResponse);
-                    ((MainActivity) getActivity()).getTTS().speak(robotResponse, TextToSpeech.QUEUE_FLUSH, null);*//*
-                }
-                //TODO
-                //switchSearch(KWS_SEARCH);
-
-            }
-
-            @Override
-            public void onRmsChanged(float rmsdB) {
-                System.out.println("Speech onRmsChanged");
-            }
-        });
-        recognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-        recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-        recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, ((MainActivity) getActivity()).getSpeechLanguage().toString());
-        recognizerIntent.putExtra(RecognizerIntent.EXTRA_PROMPT, getString(R.string.speech_prompt));
-        recognizerIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, "it.uniroma1.android.fragments");
-
-        fabButton = new FloatingActionButton.Builder(getActivity())
-                .withDrawable(getResources().getDrawable(R.drawable.speak))
-                .withButtonColor(Color.LTGRAY)
-                .withGravity(Gravity.BOTTOM | Gravity.RIGHT)
-                .withMargins(0, 0, 16, 16)
-                .create();
-        fabButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                defaultRecognizer.startListening(recognizerIntent);
-            }
-        });
-
-        //TODO
-        *//*new AsyncTask<Void, Void, Exception>() {
-            @Override
-            protected Exception doInBackground(Void... params) {
-                try {
-                    Assets assets = new Assets(getActivity().getApplicationContext());
-                    File assetDir = assets.syncAssets();
-                    setupRecognizer(assetDir);
-                } catch (IOException e) {
-                    return e;
-                }
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Exception result) {
-                if (result != null) {
-                    System.out.println("Failed to init recognizer " + result);
-                } else {
-                    switchSearch(KWS_SEARCH);
-                    System.out.println("Keyword ASR is ready!");
-                }
-            }
-        }.execute();*//*
-
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        System.out.println("onCreateView");
-        View view = inflater.inflate(R.layout.fragment_nlp_chain, container, false);
-        hypothesesTitle = (TextView) view.findViewById(R.id.youSaidTitle);
-        hypothesesTitle.setText("Transcription");
-
-        *//*commandTitle = (TextView) view.findViewById(R.id.commandTitle);
-        commandTitle.setText(R.string.command);
-        commandContent = (TextView) view.findViewById(R.id.commandContent);
-        *//*
-        hypothesesContent = (TextView) view.findViewById(R.id.youSaidContent);
-
-        if (((MainActivity) getActivity()).getClient().isConnected()) {
-            ((MainActivity) getActivity()).getClient().send("$NLP");
-        }
-        fabButton.showFloatingActionButton();
-        return view;
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        ((MainActivity) activity).onSectionAttached(getArguments().getInt(ARG_SECTION_NUMBER));
-    }
-
-    private void switchSearch(String searchName) {
-        keywordRecognizer.stop();
-        keywordRecognizer.startListening(searchName);
-    }
-
-    private void setupRecognizer(File assetsDir) throws IOException {
-        keywordRecognizer = defaultSetup()
-                .setAcousticModel(new File(assetsDir, "en-us-ptm"))
-                .setDictionary(new File(assetsDir, "cmudict-en-us.dict"))
-                .setRawLogDir(assetsDir)
-                .setBoolean("-allphone_ci", true)
-                // Threshold to tune for keyphrase to balance between false alarms and misses
-                .setKeywordThreshold(1e-45f)
-                .getRecognizer();
-        keywordRecognizer.addListener(new edu.cmu.pocketsphinx.RecognitionListener() {
-            @Override
-            public void onBeginningOfSpeech() {
-
-            }
-
-            @Override
-            public void onEndOfSpeech() {
-                if (!keywordRecognizer.getSearchName().equals(KWS_SEARCH))
-                    switchSearch(KWS_SEARCH);
-            }
-
-            @Override
-            public void onPartialResult(Hypothesis hypothesis) {
-                if (hypothesis == null)
-                    return;
-                String text = hypothesis.getHypstr();
-                if (text.equals(KEYPHRASE)) {
-                    keywordRecognizer.stop();
-                    if (defaultRecognizer != null)
-                        defaultRecognizer.startListening(recognizerIntent);
-                }
-            }
-
-            @Override
-            public void onResult(Hypothesis hypothesis) {
-
-            }
-
-            @Override
-            public void onError(Exception e) {
-
-            }
-
-            @Override
-            public void onTimeout() {
-                switchSearch(KWS_SEARCH);
-            }
-        });
-
-        keywordRecognizer.addKeyphraseSearch(KWS_SEARCH, KEYPHRASE);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        fabButton.hideFloatingActionButton();
-        //TODO
-        //keywordRecognizer.stop();
-        defaultRecognizer.stopListening();
-        //keywordRecognizer.cancel();
-        //keywordRecognizer.shutdown();
-    }*/
-
     /**
      * Function that handles the destruction of the fragment.<p/>
      * The tasks in background are stopped, audio is set again at its original value, any notification is removed.<p/>
@@ -394,10 +112,10 @@ public class SpeechInterfaceFragment extends Fragment {
         super.onDestroy();
         fabButton.hideFloatingActionButton();
 
-        pushy.destroy();
+        googleSpeechAPI.destroy();
 
-        pocket.cancelTask();
-        pocket.destroyPocket();
+        pocketSphinxAPI.cancelTask();
+        pocketSphinxAPI.destroyPocket();
 
         mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, mStreamVolume, 0);
 
@@ -419,10 +137,8 @@ public class SpeechInterfaceFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         System.out.println("onCreate");
         super.onCreate(savedInstanceState);
-
         mAudioManager = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
         mStreamVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-
         mBuilder = (NotificationCompat.Builder) new NotificationCompat.Builder(getActivity().getApplicationContext())
                 .setSmallIcon(R.drawable.ic_mic_white_24dp)
                 .setContentTitle("Continuous speech recognition running")
@@ -430,26 +146,21 @@ public class SpeechInterfaceFragment extends Fragment {
 
         /**Check options and set all the flags**/
         //Continuous/push
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
-        _continuousActive = pref.getBoolean("ContinuousVsPush", true);
+        //SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
 
+        _continuousActive = ((MainActivity) getActivity()).getContinuousActive();
         //Push/Click
-        _push = pref.getBoolean("PushVsClick", true);
-
+        _push = ((MainActivity) getActivity()).getPush();
         //Wifi only
-        _wifiOnly=pref.getBoolean("WifiOnly", true);
-
+        _wifiOnly = ((MainActivity) getActivity()).getWifiOnly();
         //Offline preferred
-        _offlinePref=pref.getBoolean("OfflinePreferred", true);
-
+        _offlinePref = ((MainActivity) getActivity()).getOfflinePref();
         //Google language
-        _lang=pref.getString("LanguageList", "-1");
-
+        _lang = ((MainActivity) getActivity()).getLang();
         //Raw log
-        _logRecord=pref.getBoolean("checkbox_preference", false);
-
+        _logRecord = ((MainActivity) getActivity()).getLogRecord();
         //Debug mode
-        _debugEnabled=pref.getBoolean("DebugEnabled", false);
+        _debugEnabled = ((MainActivity) getActivity()).getDebugEnabled();
 
 
         String path="SpeechToRobot";
@@ -511,11 +222,11 @@ public class SpeechInterfaceFragment extends Fragment {
 
                     switch (event.getAction()) {
                         case MotionEvent.ACTION_DOWN:
-                            pushy.startListening();
+                            googleSpeechAPI.startListening();
                             break;
 
                         case MotionEvent.ACTION_UP:
-                            pushy.stopListening();
+                            googleSpeechAPI.stopListening();
 
                             break;
                     }
@@ -566,13 +277,13 @@ public class SpeechInterfaceFragment extends Fragment {
 
             if(_PushStarted==false)
             {
-                pushy.startListening();
+                googleSpeechAPI.startListening();
                 mNotifyMgr.notify(mNotificationId, mBuilder.build());
                 _PushStarted=true;
             }
             else
             {
-                pushy.bruteForceStop();
+                googleSpeechAPI.bruteForceStop();
                 _PushStarted=false;
                 mNotifyMgr.cancel(mNotificationId);
             }
@@ -594,7 +305,7 @@ public class SpeechInterfaceFragment extends Fragment {
                     mNotifyMgr.notify(mNotificationId, mBuilder.build());
 
                     //Snackbar.make(view, "Activating PocketSphinx", Snackbar.LENGTH_LONG).setAction("Action", null).show();
-                    pocket.startTask();
+                    pocketSphinxAPI.startTask();
                 } else
                     makeText(getActivity().getApplicationContext(), "Mic still busy, retry in few seconds", Toast.LENGTH_SHORT).show();
             } else //stop it
@@ -605,8 +316,8 @@ public class SpeechInterfaceFragment extends Fragment {
                 mNotifyMgr.cancel(mNotificationId);
 
                 //Snackbar.make(view, "Deactivating PocketSphinx", Snackbar.LENGTH_LONG).setAction("Action", null).show();
-                pocket.cancelTask();
-                pushy.bruteForceStop();
+                pocketSphinxAPI.cancelTask();
+                googleSpeechAPI.bruteForceStop();
 
             }
         }
@@ -628,7 +339,7 @@ public class SpeechInterfaceFragment extends Fragment {
             mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 0, 0);
 
             //Call google api
-            pushy.startListening();
+            googleSpeechAPI.startListening();
         }
         else //Call pocketsphinx
         {
@@ -637,7 +348,7 @@ public class SpeechInterfaceFragment extends Fragment {
             mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, mStreamVolume, 0);
 
             makeText(getActivity().getApplicationContext(), "Switching back to PocketSphinx", Toast.LENGTH_SHORT).show();
-            pocket.startSphinx();
+            pocketSphinxAPI.startSphinx();
         }
     }
 
@@ -707,8 +418,8 @@ public class SpeechInterfaceFragment extends Fragment {
         else if(_lang.equals("4"))
             language=4;
 
-        pushy=new PushToTalk(this, getActivity().getApplicationContext(),hypothesesContent, hypothesesContent, _offlinePref, language, _debugEnabled, _continuousActive, _push);
-        pocket=new PocketSphinx(this, hypothesesContent, _debugEnabled, _logRecord, mAudioManager);
+        googleSpeechAPI =new GoogleSpeechAPI(this, getActivity().getApplicationContext(),hypothesesContent, hypothesesContent, _offlinePref, language, _debugEnabled, _continuousActive, _push);
+        pocketSphinxAPI =new PocketSphinxAPI(this, hypothesesContent, _debugEnabled, _logRecord, mAudioManager);
 
 
         fabButton.showFloatingActionButton();

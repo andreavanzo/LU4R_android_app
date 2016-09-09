@@ -25,7 +25,7 @@
     <string name="hypoTitle">Hypotheses list:</string>
     <string name="robotSaidTitle">Robot said:</string>
     <string name="youSaidTitle">You said:</string>
-    <string name="connectivityPreferences">Connectivity</string>
+    <string name="connectivityPreferences">Connection</string>
     <string name="speechPreferences">Speech</string>
     <string name="command">Command</string>
     <string name="question_text">Thank you for your contribution to this experiment! I would like to ask you a couple of questions. Please, try to be honest! Push the button to start...</string>

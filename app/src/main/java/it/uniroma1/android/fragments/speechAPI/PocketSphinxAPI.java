@@ -58,7 +58,7 @@ import static android.widget.Toast.makeText;
  * When a keyword/keyphrase is found, the user is alerted, as well as the main activity.<p/>
  * The main activity takes care of handling the subsequent steps (right now by calling Google's speech API).<p/>
  * */
-public class PocketSphinx implements RecognitionListener {
+public class PocketSphinxAPI implements RecognitionListener {
 
     private static final String KWS_SEARCH = "wakeup";
     private SpeechInterfaceFragment main;
@@ -80,7 +80,7 @@ public class PocketSphinx implements RecognitionListener {
      * Receives te link to the main activity, the view (for generating alerts), and the user choices.<p/>
      * It will search for the keyword recognition file on the SD, if available, and setup the recognition with the options selected.<p/>
      * */
-    public PocketSphinx(SpeechInterfaceFragment main, View view, boolean debug, boolean log, AudioManager audio)
+    public PocketSphinxAPI(SpeechInterfaceFragment main, View view, boolean debug, boolean log, AudioManager audio)
     {
         c=main.getActivity().getApplicationContext();
         v=view;

@@ -13,7 +13,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@android:drawable/ic_btn_speak_now"
+        android:icon="@drawable/robot_interface_icon"
         android:label="@string/app_name">
         <activity
             android:name="it.uniroma1.android.activities.MainActivity"
@@ -21,7 +21,6 @@
             android:configChanges="orientation|keyboardHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

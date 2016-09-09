@@ -20,7 +20,7 @@ import it.uniroma1.android.fragments.SpeechInterfaceFragment;
  * Class that implements Google's {@link RecognitionListener}.<p/>
  * It implements the Google API with  parameters chosen by the user.<p/>
  * */
-public class PushToTalk implements RecognitionListener {
+public class GoogleSpeechAPI implements RecognitionListener {
 
     //private PocketSphinxActivity main;
     private SpeechInterfaceFragment main;
@@ -44,7 +44,7 @@ public class PushToTalk implements RecognitionListener {
      * Other parameters are: if the user prefers offline recognition or not, the language for the recognition, if debug mode is active (it will show error messages), and which mode to use.<p/>
      * Possible modes are push to talk or continuous mode. In continuous mode the class will call the {@link SpeechInterfaceFragment} speechSwitch() to release the mic for PocketSphinx.
      * */
-    public PushToTalk(SpeechInterfaceFragment mainActivity, Context context, View view, TextView text, boolean offline, int lang, boolean debug, boolean mode, boolean push){
+    public GoogleSpeechAPI(SpeechInterfaceFragment mainActivity, Context context, View view, TextView text, boolean offline, int lang, boolean debug, boolean mode, boolean push){
         speech = SpeechRecognizer.createSpeechRecognizer(context);
         speech.setRecognitionListener(this);
         recogIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);

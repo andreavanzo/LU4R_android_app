@@ -38,7 +38,6 @@ public class TCPConnectionService extends AsyncTask<Void, Void, Void> {
                 isConnected = true;
                 kat = new KeepAwakeThread();
                 kat.start();
-                System.out.print("OK");
                 return true;
             }
         } catch (IOException e) {

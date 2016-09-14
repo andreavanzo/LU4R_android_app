@@ -1,17 +1,12 @@
 package it.uniroma1.android.fragments;
 
 import android.app.Activity;
-import android.app.DialogFragment;
 import android.app.Fragment;
 import android.content.ActivityNotFoundException;
-import android.content.ComponentName;
 import android.content.Intent;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
-import android.speech.SpeechRecognizer;
 import android.speech.tts.TextToSpeech;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -20,12 +15,10 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 import it.uniroma1.android.R;
 import it.uniroma1.android.activities.MainActivity;
-import it.uniroma1.android.dialogs.QuestionnaireDialogFragment;
 import it.uniroma1.android.utils.FloatingActionButton;
 
 public class DialogueInterfaceFragment extends Fragment {
@@ -169,7 +162,7 @@ public class DialogueInterfaceFragment extends Fragment {
                             ((MainActivity)getActivity()).getClient().send(hypoToSend);
                             String robotResponse = ((MainActivity) getActivity()).getClient().readResponse();
                             robotSaidContent.setText(robotResponse);
-                            ((MainActivity) getActivity()).getTTS().speak(robotResponse, TextToSpeech.QUEUE_FLUSH, null);
+                            MainActivity.getTTS().speak(robotResponse, TextToSpeech.QUEUE_FLUSH, null, null);
                         }
                     } else {
                         System.out.println("ECCE");

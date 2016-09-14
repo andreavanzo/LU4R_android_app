@@ -5,7 +5,6 @@ import android.app.Fragment;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -19,7 +18,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Environment;
-import android.preference.PreferenceManager;
 import android.speech.SpeechRecognizer;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.res.ResourcesCompat;
@@ -37,8 +35,8 @@ import java.io.File;
 
 import it.uniroma1.android.R;
 import it.uniroma1.android.activities.MainActivity;
-import it.uniroma1.android.fragments.speechAPI.PocketSphinxAPI;
-import it.uniroma1.android.fragments.speechAPI.GoogleSpeechAPI;
+import it.uniroma1.android.fragments.speech.PocketSphinxAPI;
+import it.uniroma1.android.fragments.speech.GoogleSpeechAPI;
 import it.uniroma1.android.utils.FloatingActionButton;
 
 import static android.widget.Toast.makeText;
@@ -146,8 +144,6 @@ public class SpeechInterfaceFragment extends Fragment {
 
         /**Check options and set all the flags**/
         //Continuous/push
-        //SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
-
         _continuousActive = ((MainActivity) getActivity()).getContinuousActive();
         //Push/Click
         _push = ((MainActivity) getActivity()).getPush();
@@ -208,9 +204,7 @@ public class SpeechInterfaceFragment extends Fragment {
                     NetworkInfo ni = cm.getActiveNetworkInfo();
 
 
-                    if ((ni == null && !_offlinePref) || ni.getType() != ConnectivityManager.TYPE_WIFI &&
-                            ni.getType() != ConnectivityManager.TYPE_MOBILE ||
-                            (ni.getType() == ConnectivityManager.TYPE_MOBILE && _wifiOnly)) {
+                    if ((ni == null && !_offlinePref) || ni.getType() != ConnectivityManager.TYPE_WIFI && ni.getType() != ConnectivityManager.TYPE_MOBILE || (ni.getType() == ConnectivityManager.TYPE_MOBILE && _wifiOnly)) {
 
                         if (_debugEnabled) //Write error cause if debug enabled
                             Snackbar.make(hypothesesContent, "Error: check Wifi/3G connection", Snackbar.LENGTH_LONG).setAction("Action", null).show();
@@ -272,8 +266,7 @@ public class SpeechInterfaceFragment extends Fragment {
 
         if(_push==false && _continuousActive==false)
         {
-            NotificationManager mNotifyMgr =
-                    (NotificationManager) getActivity().getSystemService(getActivity().getApplicationContext().NOTIFICATION_SERVICE);
+            NotificationManager mNotifyMgr = (NotificationManager) getActivity().getSystemService(getActivity().getApplicationContext().NOTIFICATION_SERVICE);
 
             if(_PushStarted==false)
             {
@@ -399,11 +392,10 @@ public class SpeechInterfaceFragment extends Fragment {
 
 
         hypothesesContent = (TextView) view.findViewById(R.id.speechContent);
-        hypothesesContent.setText("Hello");
 
 
         if (((MainActivity) getActivity()).getClient().isConnected()) {
-            ((MainActivity) getActivity()).getClient().send("$VOC");
+            ((MainActivity) getActivity()).getClient().send("$SPE");
         }
 
         int language=-1;

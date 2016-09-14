@@ -8,6 +8,7 @@
     <string name="title_section4">Dialogue interface</string>
     <string name="title_section5">NLP chain</string>
     <string name="title_section6">Questionnaire</string>
+    <string name="title_section7">Avatar</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="connect">Connect</string>

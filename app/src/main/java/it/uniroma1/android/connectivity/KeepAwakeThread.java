@@ -1,7 +1,5 @@
 package it.uniroma1.android.connectivity;
 
-import java.util.logging.Logger;
-
 import it.uniroma1.android.activities.MainActivity;
 
 /**

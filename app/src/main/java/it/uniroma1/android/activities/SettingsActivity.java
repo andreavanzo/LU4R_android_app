@@ -1,10 +1,7 @@
 package it.uniroma1.android.activities;
 
-import android.app.Activity;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceManager;
 
 import it.uniroma1.android.fragments.SettingsFragment;
 

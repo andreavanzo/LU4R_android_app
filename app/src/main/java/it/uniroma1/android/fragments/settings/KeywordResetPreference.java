@@ -1,10 +1,8 @@
 package it.uniroma1.android.fragments.settings;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Environment;
 import android.preference.DialogPreference;
-import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 
 import java.io.File;

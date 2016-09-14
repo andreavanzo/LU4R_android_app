@@ -69,6 +69,7 @@ public class MainActivity extends FragmentActivity implements NavigationDrawerFr
         super.onCreate(savedInstanceState);
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         if (connectionType.equals("wifi") && client == null)
             client = new TCPConnectionService();

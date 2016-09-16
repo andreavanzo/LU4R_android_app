@@ -4,12 +4,7 @@ package it.uniroma1.android.fragments;
 import android.app.Activity;
 import android.app.ActionBar;
 import android.app.Fragment;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothManager;
-import android.bluetooth.BluetoothProfile;
 import android.content.Context;
-import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
@@ -30,7 +25,6 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import it.uniroma1.android.R;
-import it.uniroma1.android.activities.DeviceListActivity;
 import it.uniroma1.android.activities.MainActivity;
 
 /**
@@ -56,10 +50,6 @@ public class NavigationDrawerFragment extends Fragment {
      */
     private NavigationDrawerCallbacks mCallbacks;
 
-    private static final int REQUEST_CONNECT_DEVICE_SECURE = 1;
-    private static final int REQUEST_CONNECT_DEVICE_INSECURE = 2;
-    private static final int REQUEST_ENABLE_BT = 3;
-
     /**
      * Helper component that ties the action bar to the navigation drawer.
      */
@@ -75,7 +65,6 @@ public class NavigationDrawerFragment extends Fragment {
 
     private String connectionType = "";
 
-    private BluetoothAdapter mBluetoothAdapter = null;
     private Thread awakeThread = null;
 
 
@@ -97,9 +86,6 @@ public class NavigationDrawerFragment extends Fragment {
             mCurrentSelectedPosition = savedInstanceState.getInt(STATE_SELECTED_POSITION);
             mFromSavedInstanceState = true;
         }
-        if (connectionType.equals("blue"))
-            mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-
         // Select either the default item (0) or the last selected item.
         selectItem(mCurrentSelectedPosition);
     }
@@ -272,49 +258,6 @@ public class NavigationDrawerFragment extends Fragment {
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case REQUEST_CONNECT_DEVICE_SECURE:
-                // When DeviceListActivity returns with a device to connect
-                if (resultCode == Activity.RESULT_OK) {
-                    connectDevice(data, true);
-                }
-                break;
-            case REQUEST_CONNECT_DEVICE_INSECURE:
-                // When DeviceListActivity returns with a device to connect
-                if (resultCode == Activity.RESULT_OK) {
-                    connectDevice(data, false);
-                }
-                break;
-            case REQUEST_ENABLE_BT:
-                // When the request to enable Bluetooth returns
-                if (resultCode == Activity.RESULT_OK) {
-                    // Bluetooth is now enabled, so set up a chat session
-                    //setupChat();
-                } else {
-                    // User did not enable Bluetooth or an error occurred
-                    Toast.makeText(getActivity(), "Bluetooth not enabled", Toast.LENGTH_SHORT).show();
-                    getActivity().finish();
-                }
-        }
-    }
-
-    /**
-     * Establish connection with other divice
-     *
-     * @param data   An {@link Intent} with {@link DeviceListActivity#EXTRA_DEVICE_ADDRESS} extra.
-     * @param secure Socket Security type - Secure (true) , Insecure (false)
-     */
-    private void connectDevice(Intent data, boolean secure) {
-        // Get the device MAC address
-        String address = data.getExtras().getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
-        // Get the BluetoothDevice object
-        BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
-        // Attempt to connect to the device
-        ((MainActivity)getActivity()).getBlouetoothConnectionService().connect(device, secure);
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
         if (mDrawerToggle.onOptionsItemSelected(item)) {
@@ -325,26 +268,11 @@ public class NavigationDrawerFragment extends Fragment {
             Toast.makeText(getActivity(), item.getTitle(), Toast.LENGTH_SHORT).show();
         } else if (item.getItemId() == R.id.connect) {
             switch(connectionType) {
-                case "blue":
-                    BluetoothManager mBluetoothManager = (BluetoothManager) getActivity().getApplicationContext().getSystemService(Context.BLUETOOTH_SERVICE);
-                    for (BluetoothDevice d : mBluetoothManager.getConnectedDevices(BluetoothProfile.GATT)) {
-                        System.out.println(d.getName() + " " + d.getAddress());
-                    }
-                    /*for (BluetoothDevice d : mBluetoothAdapter.getBondedDevices()) {
-                        Intent serverIntent = new Intent(getActivity(), DeviceListActivity.class);
-                        startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
-                    }*/
-                    // Get the device MAC address
-                    //BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
-                    // Attempt to connect to the device
-                    //((MainActivity) getActivity()).getBluetoothConnectionService().connect(device);
-                    break;
                 case "wifi":
                     String ipAddress = ((MainActivity) getActivity()).getIpAddress();
                     int port = ((MainActivity) getActivity()).getPort();
                     ConnectivityManager cm = (ConnectivityManager)getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
                     if (cm.getActiveNetworkInfo() != null) {
-                        //if (cm.getActiveNetworkInfo().getTypeName().toLowerCase().equals("wifi")) {
                         Toast.makeText(getActivity(), "Connecting to " + ipAddress + ":" + port + "...", Toast.LENGTH_SHORT).show();
                         boolean connected = ((MainActivity) getActivity()).getClient().connect(ipAddress, port);
                         if (connected) {
@@ -373,9 +301,6 @@ public class NavigationDrawerFragment extends Fragment {
                         } else {
                             Toast.makeText(getActivity(), "Unable to connect", Toast.LENGTH_SHORT).show();
                         }
-                        //} else {
-                        //    Toast.makeText(getActivity(), "Unable to connect: WIFI is not active", Toast.LENGTH_SHORT).show();
-                        //}
                     } else {
                         Toast.makeText(getActivity(), "Unable to connect: airplane mode active", Toast.LENGTH_SHORT).show();
                     }
@@ -384,9 +309,6 @@ public class NavigationDrawerFragment extends Fragment {
 
         } else if (item.getItemId() == R.id.disconnect) {
             switch(connectionType) {
-                case "blue":
-
-                    break;
                 case "wifi":
                     boolean disconnected = false;
                     if (((MainActivity) getActivity()).getClient().isConnected()) {

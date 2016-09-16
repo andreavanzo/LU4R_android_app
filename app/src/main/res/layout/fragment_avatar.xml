@@ -13,9 +13,9 @@
         android:layout_height="wrap_content" />
 
     <pl.droidsonroids.gif.GifImageView
-        android:id="@+id/gifImageView"
+        android:id="@+id/female_avatar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:src="@drawable/wedding_gif" />
+        android:src="@drawable/marrtina_avatar" />
 
 </RelativeLayout>

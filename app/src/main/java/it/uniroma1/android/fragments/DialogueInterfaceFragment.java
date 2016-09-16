@@ -19,7 +19,10 @@ import java.util.ArrayList;
 
 import it.uniroma1.android.R;
 import it.uniroma1.android.activities.MainActivity;
+import it.uniroma1.android.connectivity.ListeningThread;
 import it.uniroma1.android.utils.FloatingActionButton;
+import pl.droidsonroids.gif.GifDrawable;
+import pl.droidsonroids.gif.GifImageView;
 
 public class DialogueInterfaceFragment extends Fragment {
 
@@ -27,15 +30,11 @@ public class DialogueInterfaceFragment extends Fragment {
 
     private final int REQ_CODE_SPEECH_INPUT = 1001;
 
-    private TextView robotSaidContent, robotSaidTitle, youSaidContent, youSaidTitle;
-
-    private String robotResponse;
-
     private View view;
 
-    private FloatingActionButton speechFabButton;//, setFabButton;
+    private FloatingActionButton speechFabButton;
 
-    //final MainActivity ma = ((MainActivity) getActivity());
+    private GifDrawable gifDrawable;
 
 
     public static DialogueInterfaceFragment newInstance(int sectionNumber) {
@@ -59,54 +58,28 @@ public class DialogueInterfaceFragment extends Fragment {
                 .withGravity(Gravity.BOTTOM | Gravity.RIGHT)
                 .withMargins(0, 0, 16, 16)
                 .create();
-        /*setFabButton = new FloatingActionButton.Builder(getActivity())
-                .withDrawable(getResources().getDrawable(R.drawable.set))
-                .withButtonColor(Color.LTGRAY)
-                .withGravity(Gravity.BOTTOM | Gravity.RIGHT)
-                .withMargins(0, 0, 16, 96)
-                .create();*/
-
         speechFabButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //TODO
                 promptSpeechInput();
-                //defaultRecognizer.startListening(recognizerIntent);
             }
         });
-
-        /*setFabButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sendProxemicsSettings();
-            }
-        });*/
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_dialogue_interface, container, false);
-
-        robotSaidTitle = (TextView) view.findViewById(R.id.robotSaid);
-        robotSaidTitle.setText(R.string.robotSaidTitle);
-        robotSaidContent = (TextView) view.findViewById(R.id.robotSaidContent);
-        robotSaidContent.setText("");
-
-        youSaidTitle = (TextView) view.findViewById(R.id.youSaid);
-        youSaidTitle.setText(R.string.youSaidTitle);
-        youSaidContent = (TextView) view.findViewById(R.id.youSaidContent);
-        youSaidContent.setText("");
-
-
         if (MainActivity.getClient().isConnected()) {
             MainActivity.getClient().send("$DIA");
         }
-        //setFabButton.showFloatingActionButton();
+        GifImageView gifImageView = (GifImageView) view.findViewById(R.id.female_avatar);
+        gifDrawable = (GifDrawable) gifImageView.getDrawable();
+        gifDrawable.stop();
+        gifDrawable.seekToFrameAndGet(0);
+        gifDrawable.start();
         speechFabButton.showFloatingActionButton();
-
-
-
         return view;
     }
 
@@ -114,8 +87,6 @@ public class DialogueInterfaceFragment extends Fragment {
      * Showing google speech input dialog
      * */
     private void promptSpeechInput() {
-        //listeningThread.interrupt();
-        youSaidContent.setText("");
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, ((MainActivity)getActivity()).getSpeechLanguage().toString());
@@ -157,11 +128,9 @@ public class DialogueInterfaceFragment extends Fragment {
                                 hypoToSend += "]}";
                             }
                         }
-                        youSaidContent.setText(bestHypoString);
                         if (((MainActivity)getActivity()).getClient().isConnected()) {
                             ((MainActivity)getActivity()).getClient().send(hypoToSend);
                             String robotResponse = ((MainActivity) getActivity()).getClient().readResponse();
-                            robotSaidContent.setText(robotResponse);
                             MainActivity.getTTS().speak(robotResponse, TextToSpeech.QUEUE_FLUSH, null, null);
                         }
                     } else {
@@ -189,15 +158,6 @@ public class DialogueInterfaceFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        //setFabButton.hideFloatingActionButton();
         speechFabButton.hideFloatingActionButton();
     }
-
-    //EMANUELE
-    /*@Override
-    public void onResume(){
-        super.onResume();
-        robotSaidContent = (TextView) view.findViewById(R.id.robotSaidContent);
-        robotSaidContent.setText(String.valueOf(robotResponse));
-    }*/
 }

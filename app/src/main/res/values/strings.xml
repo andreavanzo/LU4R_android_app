@@ -27,48 +27,16 @@
     <string name="robotSaidTitle">Robot said:</string>
     <string name="youSaidTitle">You said:</string>
     <string name="connectivityPreferences">Connection</string>
-    <string name="speechPreferences">Speech</string>
+    <string name="joyPreferences">Joypad</string>
+    <string name="sttPreferences">Speech-To-Text</string>
+    <string name="ttsPreferences">Text-To-Speech</string>
+    <string name="avatarPreferences">Avatar</string>
     <string name="command">Command</string>
     <string name="question_text">Thank you for your contribution to this experiment! I would like to ask you a couple of questions. Please, try to be honest! Push the button to start...</string>
-    <string-array name="environment_array">
-        <item>Corridor</item>
-        <item>Outside elevator</item>
-        <item>Inside elevator</item>
-        <item>Coffee machine</item>
-        <item>Printer</item>
-    </string-array>
-    <string-array name="environment_values">
-        <item>corridor</item>
-        <item>outside</item>
-        <item>inside</item>
-        <item>coffee</item>
-        <item>printer</item>
-    </string-array>
-    <string-array name="proxemics_array">
-        <item>Intimate</item>
-        <item>Personal</item>
-        <item>Social</item>
-        <item>Collective</item>
-    </string-array>
-    <string-array name="proxemics_values">
-        <item>intimate</item>
-        <item>personal</item>
-        <item>social</item>
-        <item>collective</item>
-    </string-array>
-    <string-array name="position_array">
-        <item>Left</item>
-        <item>Center</item>
-        <item>Right</item>
-    </string-array>
-    <string-array name="position_values">
-        <item>left</item>
-        <item>center</item>
-        <item>right</item>
-    </string-array>
     <string-array name="language_array">
         <item>Default</item>
-        <item>English</item>
+        <item>English (UK)</item>
+        <item>English (US)</item>
         <item>Italian</item>
         <item>French</item>
         <item>Spanish</item>
@@ -76,49 +44,30 @@
     </string-array>
     <string-array name="language_values">
         <item>default</item>
-        <item>en_GB</item>
+        <item>en_UK</item>
+        <item>en_US</item>
         <item>it</item>
         <item>fr</item>
         <item>es</item>
         <item>de</item>
     </string-array>
     <string-array name="connection_array">
-        <item>TCP WiFi</item>
-        <item>Bluetooth</item>
+        <item>WiFi</item>
     </string-array>
     <string-array name="connection_values">
         <item>wifi</item>
-        <item>blue</item>
     </string-array>
-    <!--  DeviceListActivity -->
-    <string name="scanning">scanning for devices...</string>
-    <string name="select_device">select a device to connect</string>
-    <string name="none_paired">No devices have been paired</string>
-    <string name="none_found">No devices found</string>
-    <string name="title_paired_devices">Paired Devices</string>
-    <string name="title_other_devices">Other Available Devices</string>
-    <string name="button_scan">Scan for devices</string>
+    <string-array name="avatar_gender">
+        <item>Male</item>
+        <item>Female</item>
+    </string-array>
+    <string-array name="avatar_values">
+        <item>m</item>
+        <item>f</item>
+    </string-array>
 
 <!--Added for Speech Fragment-->
     <string name="title_activity_settings">Settings</string>
-
-    <string-array name="LanguageListHuman">
-        <item>English (US)</item>
-        <item>English (UK)</item>
-        <item>French</item>
-        <item>German</item>
-        <item>Italian</item>
-        <item>Spanish</item>
-    </string-array>
-    <string-array name="LanguageListProgram">
-        <item>-1</item>
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-        <item>4</item>
-    </string-array>
-
 
     <string name="textview_text">SeekBarPreference test</string>
 

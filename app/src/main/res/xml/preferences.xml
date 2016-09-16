@@ -27,8 +27,12 @@
             android:defaultValue="wifi"/>
     </PreferenceScreen>
     <PreferenceScreen
-        android:title="@string/speechPreferences"
-        android:key="speech_settings">
+        android:title="@string/joyPreferences"
+        android:key="joypadPreferences">
+    </PreferenceScreen>
+    <PreferenceScreen
+        android:title="@string/sttPreferences"
+        android:key="stt_settings">
         <PreferenceCategory
             android:title="General"
             android:key="general_speech_settings">
@@ -55,19 +59,11 @@
             android:key="GoogleSettings">
             <ListPreference
                 android:defaultValue="-1"
-                android:entries="@array/LanguageListHuman"
-                android:entryValues="@array/LanguageListProgram"
+                android:entries="@array/language_array"
+                android:entryValues="@array/language_values"
                 android:key="speech_language"
                 android:title="Speech language"
                 android:summary="Speech recognizer: %s"/>
-            <ListPreference
-                android:id="@+id/tts_language"
-                android:key="tts_language"
-                android:title="TTS language"
-                android:summary="Speech synthesizer: %s"
-                android:entries="@array/language_array"
-                android:entryValues="@array/language_values"
-                android:defaultValue="default" />
             <SwitchPreference
                 android:defaultValue="false"
                 android:key="offline_speech"
@@ -115,4 +111,40 @@
                 android:negativeButtonText="Cancel"/>
         </PreferenceCategory>
     </PreferenceScreen>
+    <PreferenceScreen
+        android:title="@string/ttsPreferences"
+        android:key="ttsPreferences">
+        <ListPreference
+            android:id="@+id/tts_language"
+            android:key="tts_language"
+            android:title="TTS language"
+            android:summary="Speech synthesizer: %s"
+            android:entries="@array/language_array"
+            android:entryValues="@array/language_values"
+            android:defaultValue="default" />
+        <SeekBarPreference
+            android:defaultValue="10"
+            android:title="Pitch"
+            android:max="30"
+            android:key="pitchSeekBar">
+        </SeekBarPreference>
+        <SeekBarPreference
+            android:defaultValue="10"
+            android:title="Speech rate"
+            android:max="30"
+            android:key="rateSeekBar">
+        </SeekBarPreference>
+    </PreferenceScreen>
+    <!--<PreferenceScreen
+        android:title="@string/avatarPreferences"
+        android:key="avatarPreferences">
+        <ListPreference
+            android:id="@+id/avatar_gender"
+            android:key="avatar_gender"
+            android:title="Avatar gender"
+            android:summary="Select the gender of the avatar"
+            android:entries="@array/avatar_gender"
+            android:entryValues="@array/avatar_values"
+            android:defaultValue="m"/>
+    </PreferenceScreen>-->
 </PreferenceScreen>

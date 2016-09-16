@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 import it.uniroma1.android.activities.MainActivity;
 import it.uniroma1.android.fragments.SpeechInterfaceFragment;
@@ -27,7 +28,6 @@ public class GoogleSpeechAPI implements RecognitionListener {
     private SpeechRecognizer speech;
     private Intent recogIntent;
     private TextView t;
-    private Context c;
     private boolean debugActive=false;
     private boolean continuousModeActive=false;
     private boolean pushActive=true;
@@ -44,31 +44,17 @@ public class GoogleSpeechAPI implements RecognitionListener {
      * Other parameters are: if the user prefers offline recognition or not, the language for the recognition, if debug mode is active (it will show error messages), and which mode to use.<p/>
      * Possible modes are push to talk or continuous mode. In continuous mode the class will call the {@link SpeechInterfaceFragment} speechSwitch() to release the mic for PocketSphinx.
      * */
-    public GoogleSpeechAPI(SpeechInterfaceFragment mainActivity, Context context, View view, TextView text, boolean offline, int lang, boolean debug, boolean mode, boolean push){
+    public GoogleSpeechAPI(SpeechInterfaceFragment mainActivity, Context context, View view, TextView text, boolean offline, Locale lang, boolean debug, boolean mode, boolean push){
         speech = SpeechRecognizer.createSpeechRecognizer(context);
         speech.setRecognitionListener(this);
         recogIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-
         recogIntent.putExtra(RecognizerIntent.EXTRA_CONFIDENCE_SCORES, true);
-
         if(android.os.Build.VERSION.SDK_INT>=23) //Offline speech has been added in Marshmallow (API 23)
             recogIntent.putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, offline);
-
-        if(lang==-1)
-            recogIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-US");
-        if(lang==0)
-            recogIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-UK");
-        if(lang==1)
-            recogIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "fr-FR");
-        if(lang==2)
-            recogIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "de-DE");
-        if(lang==3)
-            recogIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "it-IT");
-        if(lang==4)
-            recogIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "es-ES");
-
-
-        c=context;
+        recogIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,lang);
+        recogIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, lang);
+        recogIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, lang);
+        recogIntent.putExtra(RecognizerIntent.EXTRA_ONLY_RETURN_LANGUAGE_PREFERENCE, lang);
         v=view;
         t=text;
         debugActive=debug;

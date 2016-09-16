@@ -1,7 +1,5 @@
 package it.uniroma1.android.utils;
 
-import it.uniroma1.android.connectivity.BluetoothConnectionService;
-
 /**
  * Defines several constants used between {@link BluetoothConnectionService} and the UI.
  */

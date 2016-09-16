@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.NotificationManager;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -18,7 +17,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Environment;
-import android.speech.SpeechRecognizer;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.NotificationCompat;
@@ -32,6 +30,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.util.Locale;
 
 import it.uniroma1.android.R;
 import it.uniroma1.android.activities.MainActivity;
@@ -50,27 +49,13 @@ public class SpeechInterfaceFragment extends Fragment {
 
     public static final String ARG_SECTION_NUMBER = "section_number";
 
-    private final int REQ_CODE_SPEECH_INPUT = 100;
-
-    private TextView hypothesesContent, hypothesesTitle, commandTitle, commandContent;
+    private TextView hypothesesContent;
 
     private FloatingActionButton fabButton;
 
-    private SpeechRecognizer defaultRecognizer;
-
-    private Intent recognizerIntent;
-
-    private edu.cmu.pocketsphinx.SpeechRecognizer keywordRecognizer;
-
-    private static final String KWS_SEARCH = "wakeup";
-
-    private static final String KEYPHRASE = "ok robot";
-
-
-    private boolean _SphinxStarted=false;
-    private boolean _SwitchToGoogle=true;
-    private boolean _changed=false;
-    private boolean _PushStarted=false;
+    private boolean sphinxActive =false;
+    private boolean switchToGoogle =true;
+    private boolean pushStarted =false;
 
     private AudioManager mAudioManager;
     private int mStreamVolume = 0;
@@ -79,13 +64,13 @@ public class SpeechInterfaceFragment extends Fragment {
     private int mNotificationId = 001;
 
     //Settings for the program
-    private boolean _continuousActive=false;
-    private boolean _wifiOnly=false;
-    private boolean _push=true;
-    private boolean _offlinePref=true;
-    private String _lang="-1";
-    private boolean _logRecord=false;
-    private boolean _debugEnabled=false;
+    private boolean continuousActive =false;
+    private boolean wifiOnly =false;
+    private boolean push =true;
+    private boolean offlinePref =true;
+    private Locale language = Locale.getDefault();
+    private boolean logRecord =false;
+    private boolean debugEnabled =false;
 
     //ProgramModes
     private GoogleSpeechAPI googleSpeechAPI;
@@ -117,7 +102,7 @@ public class SpeechInterfaceFragment extends Fragment {
 
         mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, mStreamVolume, 0);
 
-        if(_SphinxStarted) //remove notification
+        if(sphinxActive) //remove notification
         {
             NotificationManager mNotifyMgr =
                     (NotificationManager) getActivity().getSystemService(getActivity().getApplicationContext().NOTIFICATION_SERVICE);
@@ -133,7 +118,6 @@ public class SpeechInterfaceFragment extends Fragment {
      * */
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        System.out.println("onCreate");
         super.onCreate(savedInstanceState);
         mAudioManager = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
         mStreamVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
@@ -144,19 +128,19 @@ public class SpeechInterfaceFragment extends Fragment {
 
         /**Check options and set all the flags**/
         //Continuous/push
-        _continuousActive = ((MainActivity) getActivity()).getContinuousActive();
+        continuousActive = ((MainActivity) getActivity()).getContinuousActive();
         //Push/Click
-        _push = ((MainActivity) getActivity()).getPush();
+        push = ((MainActivity) getActivity()).getPush();
         //Wifi only
-        _wifiOnly = ((MainActivity) getActivity()).getWifiOnly();
+        wifiOnly = ((MainActivity) getActivity()).getWifiOnly();
         //Offline preferred
-        _offlinePref = ((MainActivity) getActivity()).getOfflinePref();
+        offlinePref = ((MainActivity) getActivity()).getOfflinePref();
         //Google language
-        _lang = ((MainActivity) getActivity()).getLang();
+        language = ((MainActivity) getActivity()).getSpeechLanguage();
         //Raw log
-        _logRecord = ((MainActivity) getActivity()).getLogRecord();
+        logRecord = ((MainActivity) getActivity()).getLogRecord();
         //Debug mode
-        _debugEnabled = ((MainActivity) getActivity()).getDebugEnabled();
+        debugEnabled = ((MainActivity) getActivity()).getDebugEnabled();
 
 
         String path="SpeechToRobot";
@@ -166,7 +150,7 @@ public class SpeechInterfaceFragment extends Fragment {
         /**Button creation**/
         int icon;
 
-        if (!_continuousActive) {
+        if (!continuousActive) {
             icon = R.drawable.speak;
         } else {
             icon = R.drawable.ic_power_settings_new_black_24dp;
@@ -204,14 +188,14 @@ public class SpeechInterfaceFragment extends Fragment {
                     NetworkInfo ni = cm.getActiveNetworkInfo();
 
 
-                    if ((ni == null && !_offlinePref) || ni.getType() != ConnectivityManager.TYPE_WIFI && ni.getType() != ConnectivityManager.TYPE_MOBILE || (ni.getType() == ConnectivityManager.TYPE_MOBILE && _wifiOnly)) {
+                    if ((ni == null && !offlinePref) || ni.getType() != ConnectivityManager.TYPE_WIFI && ni.getType() != ConnectivityManager.TYPE_MOBILE || (ni.getType() == ConnectivityManager.TYPE_MOBILE && wifiOnly)) {
 
-                        if (_debugEnabled) //Write error cause if debug enabled
+                        if (debugEnabled) //Write error cause if debug enabled
                             Snackbar.make(hypothesesContent, "Error: check Wifi/3G connection", Snackbar.LENGTH_LONG).setAction("Action", null).show();
                         return true;
                     }
 
-                    if (_continuousActive || _push == false) //if continuous is enabled, don't care about touch, only click
+                    if (continuousActive || push == false) //if continuous is enabled, don't care about touch, only click
                         return false;
 
                     switch (event.getAction()) {
@@ -261,23 +245,23 @@ public class SpeechInterfaceFragment extends Fragment {
      * */
     public void clicked(View view){
 
-        if(_continuousActive==false && _push==true) //If we are in push to talk mode we don't care about sphinx
+        if(continuousActive ==false && push ==true) //If we are in push to talk mode we don't care about sphinx
             return;
 
-        if(_push==false && _continuousActive==false)
+        if(push ==false && continuousActive ==false)
         {
             NotificationManager mNotifyMgr = (NotificationManager) getActivity().getSystemService(getActivity().getApplicationContext().NOTIFICATION_SERVICE);
 
-            if(_PushStarted==false)
+            if(pushStarted ==false)
             {
                 googleSpeechAPI.startListening();
                 mNotifyMgr.notify(mNotificationId, mBuilder.build());
-                _PushStarted=true;
+                pushStarted =true;
             }
             else
             {
                 googleSpeechAPI.bruteForceStop();
-                _PushStarted=false;
+                pushStarted =false;
                 mNotifyMgr.cancel(mNotificationId);
             }
         }
@@ -286,12 +270,12 @@ public class SpeechInterfaceFragment extends Fragment {
             NotificationManager mNotifyMgr =
                     (NotificationManager) getActivity().getSystemService(getActivity().getApplicationContext().NOTIFICATION_SERVICE);
 
-            if (_SphinxStarted == false) //start it
+            if (sphinxActive == false) //start it
             {
                 //Check if the mic is busy before starting, if it's busy tell the user to retry in few seconds
                 if (checkIfMicrophoneIsBusy(getActivity().getApplicationContext()) == true) {
-                    _SwitchToGoogle = true;
-                    _SphinxStarted = true;
+                    switchToGoogle = true;
+                    sphinxActive = true;
                     makeText(getActivity().getApplicationContext(), "Activating PocketSphinx", Toast.LENGTH_SHORT).show();
 
                     // Builds the notification and issues it.
@@ -303,7 +287,7 @@ public class SpeechInterfaceFragment extends Fragment {
                     makeText(getActivity().getApplicationContext(), "Mic still busy, retry in few seconds", Toast.LENGTH_SHORT).show();
             } else //stop it
             {
-                _SphinxStarted = false;
+                sphinxActive = false;
                 makeText(getActivity().getApplicationContext(), "Deactivating PocketSphinx", Toast.LENGTH_SHORT).show();
 
                 mNotifyMgr.cancel(mNotificationId);
@@ -323,9 +307,9 @@ public class SpeechInterfaceFragment extends Fragment {
      * */
     public void speechSwitch()
     {
-        if(_SwitchToGoogle==true) //Call google
+        if(switchToGoogle == true) //Call google
         {
-            _SwitchToGoogle=false;
+            switchToGoogle =false;
             makeText(getActivity().getApplicationContext(), "Calling Google API", Toast.LENGTH_SHORT).show();
 
             mStreamVolume=mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
@@ -336,7 +320,7 @@ public class SpeechInterfaceFragment extends Fragment {
         }
         else //Call pocketsphinx
         {
-            _SwitchToGoogle=true;
+            switchToGoogle =true;
 
             mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, mStreamVolume, 0);
 
@@ -398,20 +382,8 @@ public class SpeechInterfaceFragment extends Fragment {
             ((MainActivity) getActivity()).getClient().send("$SPE");
         }
 
-        int language=-1;
-        if(_lang.equals("0"))
-            language=0;
-        else if(_lang.equals("1"))
-            language=1;
-        else if(_lang.equals("2"))
-            language=2;
-        else if(_lang.equals("3"))
-            language=3;
-        else if(_lang.equals("4"))
-            language=4;
-
-        googleSpeechAPI =new GoogleSpeechAPI(this, getActivity().getApplicationContext(),hypothesesContent, hypothesesContent, _offlinePref, language, _debugEnabled, _continuousActive, _push);
-        pocketSphinxAPI =new PocketSphinxAPI(this, hypothesesContent, _debugEnabled, _logRecord, mAudioManager);
+        googleSpeechAPI =new GoogleSpeechAPI(this, getActivity().getApplicationContext(), hypothesesContent, hypothesesContent, offlinePref, language, debugEnabled, continuousActive, push);
+        pocketSphinxAPI =new PocketSphinxAPI(this, hypothesesContent, debugEnabled, logRecord, mAudioManager);
 
 
         fabButton.showFloatingActionButton();

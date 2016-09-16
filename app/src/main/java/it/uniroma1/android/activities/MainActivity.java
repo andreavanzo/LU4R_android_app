@@ -22,7 +22,6 @@ import android.widget.Toast;
 import java.util.Locale;
 
 import it.uniroma1.android.R;
-import it.uniroma1.android.connectivity.BluetoothConnectionService;
 import it.uniroma1.android.connectivity.TCPConnectionService;
 import it.uniroma1.android.fragments.AvatarFragment;
 import it.uniroma1.android.fragments.DialogueInterfaceFragment;
@@ -45,7 +44,8 @@ public class MainActivity extends FragmentActivity implements NavigationDrawerFr
     private PreferenceChangeListener mPreferenceListener = null;
     private static String ip_address = "127.0.0.1";
     private static int port = 4567;
-    private static Locale speechLanguage = Locale.getDefault();
+    private static Locale sttLanguage = Locale.getDefault();
+    private static String ttsLanguage = Locale.getDefault().toString();
     private static TextToSpeech tts = null;
     private static String activeFragment = "";
     private static String connectionType = "wifi";
@@ -56,7 +56,6 @@ public class MainActivity extends FragmentActivity implements NavigationDrawerFr
     private static String lang = "-1";
     private static boolean logRecord = false;
     private static boolean debugEnabled = false;
-    private BluetoothConnectionService bcs = null;
     protected PowerManager.WakeLock mWakeLock;
 
     /**
@@ -73,8 +72,6 @@ public class MainActivity extends FragmentActivity implements NavigationDrawerFr
 
         if (connectionType.equals("wifi") && client == null)
             client = new TCPConnectionService();
-        if (connectionType.equals("blue") && bcs == null)
-            bcs = new BluetoothConnectionService(getApplicationContext());
         setContentView(R.layout.activity_main);
 
         //Init preferences
@@ -149,18 +146,6 @@ public class MainActivity extends FragmentActivity implements NavigationDrawerFr
                 sectionName = getString(R.string.title_section7);
                 activeFragment = "$AVA";
                 break;
-            /*case 4:
-                //NLPchain
-                frag = NLPChainFragment.newInstance(position +1 );
-                sectionName = getString(R.string.title_section5);
-                activeFragment = "$NLP";
-                break;
-            case 5:
-                //Questionnaire
-                frag = QuestionnaireFragment.newInstance(position +1);
-                sectionName = getString(R.string.title_section6);
-                activeFragment = "$QUE";
-                break;*/
         }
         fragmentTransaction.replace(R.id.container, frag, activeFragment);
         fragmentTransaction.commit();
@@ -184,12 +169,6 @@ public class MainActivity extends FragmentActivity implements NavigationDrawerFr
             case 5:
                 mTitle = getString(R.string.title_section7);
                 break;
-            /*case 5:
-                mTitle = getString(R.string.title_section5);
-                break;
-            case 6:
-                mTitle = getString(R.string.title_section6);
-                break;*/
         }
     }
 
@@ -264,9 +243,9 @@ public class MainActivity extends FragmentActivity implements NavigationDrawerFr
 
         String tempLanguage = sharedPref.getString("speech_language", "default");
         if (tempLanguage.equals("default"))
-            speechLanguage = Locale.getDefault();
+            sttLanguage = Locale.getDefault();
         else
-            speechLanguage = new Locale(tempLanguage);
+            sttLanguage = new Locale(tempLanguage);
         tempLanguage = sharedPref.getString("tts_language", "default");
         if (tempLanguage.equals("default"))
             tts.setLanguage(Locale.getDefault());
@@ -275,36 +254,31 @@ public class MainActivity extends FragmentActivity implements NavigationDrawerFr
         offlinePref = sharedPref.getBoolean("offline_speech", true);
         wifiOnly = sharedPref.getBoolean("wifi_speech", true);
         debugEnabled = sharedPref.getBoolean("debug_speech", false);
-
         logRecord = sharedPref.getBoolean("recording_preference", false);
-        lang = sharedPref.getString("LanguageList", "-1");
-
-
+        float newPitch = ((float)sharedPref.getInt("pitchSeekBar", 1)) / 10.0f;
+        tts.setPitch(newPitch);
+        float newRate = ((float)sharedPref.getInt("rateSeekBar", 1)) / 10.0f;
+        tts.setSpeechRate(newRate);
     }
 
     public void applySingleSetting(String key) {
         switch (key) {
             case "ip_address":
                 ip_address = sharedPref.getString(key, "127.0.0.1");
-                System.out.println(ip_address);
                 break;
             case "port":
                 port = Integer.parseInt(sharedPref.getString(key, "4567"));
-                System.out.println(port);
                 break;
             case "connection":
                 connectionType = sharedPref.getString(key, "wifi");
                 break;
             case "continuous_speech":
-                System.out.println("OK");
                 continuousActive = sharedPref.getBoolean(key, true);
                 if (continuousActive) {
                     SharedPreferences.Editor editor = sharedPref.edit();
                     editor.putBoolean("push_settings", false);
                     editor.commit();
                     push = false;
-                    System.out.println(sharedPref.getBoolean("push_settings", false));
-                    System.out.println("push " + push);
                 }
                 break;
             case "push_settings":
@@ -313,18 +287,16 @@ public class MainActivity extends FragmentActivity implements NavigationDrawerFr
             case "speech_language":
                 String tempLanguage = sharedPref.getString(key, "default");
                 if (tempLanguage.equals("default"))
-                    speechLanguage = Locale.getDefault();
+                    sttLanguage = Locale.getDefault();
                 else
-                    speechLanguage = new Locale(tempLanguage);
-                System.out.println(speechLanguage);
+                    sttLanguage = new Locale(tempLanguage);
                 break;
             case "tts_language":
-                String ttsLanguage = sharedPref.getString(key, "default");
+                ttsLanguage = sharedPref.getString(key, "default");
                 if (ttsLanguage.equals("default"))
                     tts.setLanguage(Locale.getDefault());
                 else
                     tts.setLanguage(new Locale(ttsLanguage));
-                System.out.println(tts.getLanguage());
                 break;
             case "offline_speech":
                 offlinePref = sharedPref.getBoolean(key, true);
@@ -338,8 +310,17 @@ public class MainActivity extends FragmentActivity implements NavigationDrawerFr
             case "recording_preference":
                 logRecord = sharedPref.getBoolean(key, false);
                 break;
-            case "LanguageList":
-                lang = sharedPref.getString(key, "-1");
+            case "pitchSeekBar":
+                float newPitch = ((float)sharedPref.getInt("pitchSeekBar", 1)) / 10.0f;
+                tts.setPitch(newPitch);
+                Toast.makeText(getApplicationContext(), "Pitch: " + newPitch, Toast.LENGTH_SHORT).show();
+                tts.speak("Questa è una prova", TextToSpeech.QUEUE_FLUSH, null, null);
+                break;
+            case "rateSeekBar":
+                float newRate = ((float)sharedPref.getInt("rateSeekBar", 1)) / 10.0f;
+                tts.setSpeechRate(newRate);
+                Toast.makeText(getApplicationContext(), "Rate: " + newRate, Toast.LENGTH_SHORT).show();
+                tts.speak("Questa è una prova", TextToSpeech.QUEUE_FLUSH, null, null);
                 break;
         }
     }
@@ -388,33 +369,17 @@ public class MainActivity extends FragmentActivity implements NavigationDrawerFr
         return logRecord;
     }
 
-    public String getLang() {
-        return lang;
-    }
-
     public static TextToSpeech getTTS() {
         return tts;
     }
 
     public Locale getSpeechLanguage() {
-        return speechLanguage;
+        return sttLanguage;
     }
 
-
-    public SharedPreferences getSharedPref() {
-        return sharedPref;
-    }
 
     public String getActiveFragmentString() {
         return activeFragment;
-    }
-
-    public Fragment getActiveFragment() {
-        return frag;
-    }
-
-    public BluetoothConnectionService getBlouetoothConnectionService() {
-        return bcs;
     }
 
 }

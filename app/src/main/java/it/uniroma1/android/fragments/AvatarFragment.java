@@ -49,7 +49,7 @@ public class AvatarFragment extends Fragment {
         }
         lt = new ListeningThread();
         lt.start();
-        final GifImageView gifImageView = (GifImageView) view.findViewById(R.id.gifImageView);
+        GifImageView gifImageView = (GifImageView) view.findViewById(R.id.female_avatar);
         gifDrawable = (GifDrawable) gifImageView.getDrawable();
         gifDrawable.stop();
         gifDrawable.seekToFrameAndGet(0);

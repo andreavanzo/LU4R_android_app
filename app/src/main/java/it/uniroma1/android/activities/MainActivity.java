@@ -53,7 +53,6 @@ public class MainActivity extends FragmentActivity implements NavigationDrawerFr
     private static boolean push = false;
     private static boolean wifiOnly = true;
     private static boolean offlinePref = true;
-    private static String lang = "-1";
     private static boolean logRecord = false;
     private static boolean debugEnabled = false;
     protected PowerManager.WakeLock mWakeLock;
@@ -135,7 +134,7 @@ public class MainActivity extends FragmentActivity implements NavigationDrawerFr
                 sectionName = getString(R.string.title_section3);
                 activeFragment = "$SPE";
                 break;
-            case 3:
+            /*case 3:
                 //DialogueInterface
                 frag = DialogueInterfaceFragment.newInstance(position + 1);
                 sectionName = getString(R.string.title_section4);
@@ -145,7 +144,7 @@ public class MainActivity extends FragmentActivity implements NavigationDrawerFr
                 frag = AvatarFragment.newInstance(position + 1);
                 sectionName = getString(R.string.title_section7);
                 activeFragment = "$AVA";
-                break;
+                break;*/
         }
         fragmentTransaction.replace(R.id.container, frag, activeFragment);
         fragmentTransaction.commit();
@@ -163,12 +162,12 @@ public class MainActivity extends FragmentActivity implements NavigationDrawerFr
             case 3:
                 mTitle = getString(R.string.title_section3);
                 break;
-            case 4:
+            /*case 4:
                 mTitle = getString(R.string.title_section4);
                 break;
             case 5:
                 mTitle = getString(R.string.title_section7);
-                break;
+                break;*/
         }
     }
 

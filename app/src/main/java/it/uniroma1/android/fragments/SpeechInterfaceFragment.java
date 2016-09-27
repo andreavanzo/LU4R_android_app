@@ -369,23 +369,15 @@ public class SpeechInterfaceFragment extends Fragment {
      * This function takes care of initialising the google and pocketsphinx api, and inits also the view for hypothesis printing.<p/>
      * */
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         System.out.println("onCreateView");
         View view = inflater.inflate(R.layout.fragment_speech_interface, container, false);
-
-
         hypothesesContent = (TextView) view.findViewById(R.id.speechContent);
-
-
         if (((MainActivity) getActivity()).getClient().isConnected()) {
-            ((MainActivity) getActivity()).getClient().send("$SPE");
+            ((MainActivity) getActivity()).getClient().send("$SLU");
         }
-
         googleSpeechAPI =new GoogleSpeechAPI(this, getActivity().getApplicationContext(), hypothesesContent, hypothesesContent, offlinePref, language, debugEnabled, continuousActive, push);
         pocketSphinxAPI =new PocketSphinxAPI(this, hypothesesContent, debugEnabled, logRecord, mAudioManager);
-
-
         fabButton.showFloatingActionButton();
         return view;
     }

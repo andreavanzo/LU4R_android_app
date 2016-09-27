@@ -62,11 +62,9 @@ public class JoypadFragment extends Fragment {
         js.setStickAlpha(100);
         js.setOffset(90);
         js.setMinimumDistance(20);
-
         if (((MainActivity) getActivity()).getClient().isConnected()) {
             ((MainActivity) getActivity()).getClient().send("$JOY");
         }
-
         layout_joystick.setOnTouchListener(new View.OnTouchListener() {
             public boolean onTouch(View arg0, MotionEvent arg1) {
                 js.drawStick(arg1);

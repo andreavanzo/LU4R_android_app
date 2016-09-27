@@ -65,13 +65,13 @@ public class PocketSphinxAPI implements RecognitionListener {
     private Context c;
     private View v;
 
-    private boolean _debugActive=false;
-    private boolean _logActive=false;
-    private boolean _keepRunning=false;
-    private int _volume=0;
+    private boolean debugActive =false;
+    private boolean logActive =false;
+    private boolean keepRunning =false;
+    private int volume =0;
 
     private SpeechRecognizer recognizer;
-    AsyncTask<Void, Void, Exception> _async=null;
+    AsyncTask<Void, Void, Exception> async =null;
     private AudioManager audio;
 
 
@@ -82,14 +82,13 @@ public class PocketSphinxAPI implements RecognitionListener {
      * */
     public PocketSphinxAPI(SpeechInterfaceFragment main, View view, boolean debug, boolean log, AudioManager audio)
     {
-        c=main.getActivity().getApplicationContext();
-        v=view;
-        this.main=main;
-        _debugActive=debug;
-        _logActive=log;
-        this.audio=audio;
-
-        _volume = audio.getStreamVolume(AudioManager.STREAM_MUSIC);
+        c = main.getActivity().getApplicationContext();
+        v = view;
+        this.main = main;
+        debugActive = debug;
+        logActive = log;
+        this.audio = audio;
+        volume = audio.getStreamVolume(AudioManager.STREAM_MUSIC);
 
 
         try {
@@ -97,37 +96,35 @@ public class PocketSphinxAPI implements RecognitionListener {
             Assets assets = new Assets(main.getActivity());
             File assetDir = assets.syncAssets();
 
-            if(!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
                 keyDir = null;
-            }
-            else
-            {
+            } else {
                 keyDir = new File(Environment.getExternalStorageDirectory().getPath().toString() + "/SpeechToRobot/config.gram");
-                if (!keyDir.exists())
+                if (!keyDir.exists()) {
                     keyDir = null;
+                }
             }
             setupRecognizer(assetDir, keyDir);
-        } catch(Exception e)
-        {
-            if(_debugActive)
-                Snackbar.make(v, "Unable to create PocketSphinx: "+e.getMessage(), Snackbar.LENGTH_LONG).setAction("Action", null).show();
+        } catch(Exception e) {
+            if (debugActive) {
+                Snackbar.make(v, "Unable to create PocketSphinx: " + e.getMessage(), Snackbar.LENGTH_LONG).setAction("Action", null).show();
+            }
         }
 
 
     }
 
     private void setupRecognizer(File assetsDir, File keyDir) throws IOException {
-
-        if(_logActive && !Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))
+        if (logActive && !Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             recognizer = SpeechRecognizerSetup.defaultSetup()
                     .setAcousticModel(new File(assetsDir, "en-us-ptm"))
                     .setDictionary(new File(assetsDir, "cmudict-en-us.dict"))
-                    .setRawLogDir(new File(Environment.getExternalStorageDirectory().getPath().toString()+"/SpeechToRobot"))
+                    .setRawLogDir(new File(Environment.getExternalStorageDirectory().getPath().toString() + "/SpeechToRobot"))
                     .setBoolean("-allphone_ci", true)
                     .setBoolean("-backtrace", true)
                     .setBoolean("-bestpath", false)
                     .getRecognizer();
-        else
+        } else {
             recognizer = SpeechRecognizerSetup.defaultSetup()
                     .setAcousticModel(new File(assetsDir, "en-us-ptm"))
                     .setDictionary(new File(assetsDir, "cmudict-en-us.dict"))
@@ -135,14 +132,12 @@ public class PocketSphinxAPI implements RecognitionListener {
                     .setBoolean("-backtrace", true)
                     .setBoolean("-bestpath", false)
                     .getRecognizer();
-
+        }
         recognizer.addListener(this);
-
-
         File keyWords = new File(assetsDir, "key.gram");
-        if(keyDir!=null)
-            keyWords=new File(Environment.getExternalStorageDirectory().getPath().toString()+"/SpeechToRobot", "config.gram");
-
+        if (keyDir != null) {
+            keyWords = new File(Environment.getExternalStorageDirectory().getPath().toString() + "/SpeechToRobot", "config.gram");
+        }
         recognizer.addKeywordSearch(KWS_SEARCH, keyWords);
     }
 
@@ -162,9 +157,9 @@ public class PocketSphinxAPI implements RecognitionListener {
      */
     @Override
     public void onPartialResult(Hypothesis hypothesis) {
-        if (hypothesis == null)
+        if (hypothesis == null) {
             return;
-
+        }
         recognizer.stop();
     }
 
@@ -175,12 +170,10 @@ public class PocketSphinxAPI implements RecognitionListener {
      */
     @Override
     public void onResult(Hypothesis hypothesis) {
-        if (hypothesis == null)
+        if (hypothesis == null) {
             return;
-
+        }
         String text = hypothesis.getHypstr();
-        //makeText(getApplicationContext(), "Res:*"+text+"*", Toast.LENGTH_SHORT).show();
-
         recognizer.cancel();
         performAction(text);
     }
@@ -204,8 +197,9 @@ public class PocketSphinxAPI implements RecognitionListener {
      * */
     @Override
     public void onError(Exception error) {
-        if(_debugActive)
-            Snackbar.make(v, "PocketSpinx error: "+error.getMessage(), Snackbar.LENGTH_LONG).setAction("Action", null).show();
+        if (debugActive) {
+            Snackbar.make(v, "PocketSpinx error: " + error.getMessage(), Snackbar.LENGTH_LONG).setAction("Action", null).show();
+        }
     }
 
 
@@ -215,14 +209,12 @@ public class PocketSphinxAPI implements RecognitionListener {
      * If the user has not stopped the program, call the {@link SpeechInterfaceFragment} speechSwitch.<p/>
      * */
     private void performAction(String text) {
-
-        audio.setStreamVolume(AudioManager.STREAM_MUSIC, _volume, 0);
-
+        audio.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0);
         final ToneGenerator tg = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
         tg.startTone(ToneGenerator.TONE_SUP_RADIO_ACK);
-
-        if(_keepRunning==true)
+        if (keepRunning == true) {
             main.speechSwitch();
+        }
 
     }
 
@@ -230,14 +222,12 @@ public class PocketSphinxAPI implements RecognitionListener {
      * Function that handles the cancelling the Async task.<p/>
      * Sets the bool of keepRunning to false (so listener knows of the user choice) and sets the Async Task cancel bool as true.<p/>
      * */
-    public void cancelTask()
-    {
-        _keepRunning=false;
-        if(_async!=null)
-        {
+    public void cancelTask() {
+        keepRunning = false;
+        if (async != null) {
             recognizer.stop();
-            _async.cancel(true);
-            _async = null;
+            async.cancel(true);
+            async = null;
         }
 
     }
@@ -247,24 +237,19 @@ public class PocketSphinxAPI implements RecognitionListener {
      * If there is not an other instance currently active, generates the Async Task and calls startSphinx() as doInBackground action.<p/>
      * */
     public void startTask() {
-        _keepRunning = true;
-
-        if (_async == null) {
-            _async = new AsyncTask<Void, Void, Exception>() {
+        keepRunning = true;
+        if (async == null) {
+            async = new AsyncTask<Void, Void, Exception>() {
                 @Override
                 protected Exception doInBackground(Void... params) {
-
                     startSphinx();
-
                     return null;
                 }
-
             };
-
-            _async.execute();
-        }
-        else
+            async.execute();
+        } else {
             makeText(c, "PocketSphinx is already running", Toast.LENGTH_SHORT).show();
+        }
 
     }
 
@@ -273,15 +258,11 @@ public class PocketSphinxAPI implements RecognitionListener {
      * The sound removal is necessary because the speech recognition has some system tones that are unwanted for the user.<p/>
      * The sound will be turned back on after the recognition is done.<p/>
      * */
-    public void startSphinx()
-    {
-        _volume = audio.getStreamVolume(AudioManager.STREAM_MUSIC);
-        if (_keepRunning == true) {
+    public void startSphinx() {
+        volume = audio.getStreamVolume(AudioManager.STREAM_MUSIC);
+        if (keepRunning == true) {
             audio.setStreamVolume(AudioManager.STREAM_MUSIC, 0, 0);
             recognizer.startListening(KWS_SEARCH);
         }
     }
-
-
-
 }

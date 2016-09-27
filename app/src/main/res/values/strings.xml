@@ -4,7 +4,7 @@
     <string name="app_name">Robot Interface</string>
     <string name="title_section1">Home</string>
     <string name="title_section2">Joypad</string>
-    <string name="title_section3">Speech interface</string>
+    <string name="title_section3">Speech Interface</string>
     <string name="title_section4">Dialogue interface</string>
     <string name="title_section5">NLP chain</string>
     <string name="title_section6">Questionnaire</string>
@@ -32,7 +32,12 @@
     <string name="ttsPreferences">Text-To-Speech</string>
     <string name="avatarPreferences">Avatar</string>
     <string name="command">Command</string>
-    <string name="question_text">Thank you for your contribution to this experiment! I would like to ask you a couple of questions. Please, try to be honest! Push the button to start...</string>
+    <string name="ex_en">This is an example of speech synthesis in English</string>
+    <string name="ex_it">Questo è un esempio di sintesi vocale in Italiano</string>
+    <string name="ex_fr">Ceci est un exemple de synthèse de la parole en Français</string>
+    <string name="ex_es">Este es un ejemplo de síntesis de voz en Español</string>
+    <string name="ex_de">Dies ist ein Beispiel für die Sprachsynthese in Deutsch</string>
+
     <string-array name="language_array">
         <item>Default</item>
         <item>English (UK)</item>

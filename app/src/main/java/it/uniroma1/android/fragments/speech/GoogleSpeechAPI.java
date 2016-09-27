@@ -28,13 +28,13 @@ public class GoogleSpeechAPI implements RecognitionListener {
     private SpeechRecognizer speech;
     private Intent recogIntent;
     private TextView t;
-    private boolean debugActive=false;
-    private boolean continuousModeActive=false;
-    private boolean pushActive=true;
+    private boolean debugActive = false;
+    private boolean continuousModeActive = false;
+    private boolean pushActive = true;
     private boolean isEndOfSpeech = false;
     private View v;
 
-    private boolean stop=false;
+    private boolean stop = false;
 
     private static final String TAG = "PushToTalk";
 
@@ -49,18 +49,20 @@ public class GoogleSpeechAPI implements RecognitionListener {
         speech.setRecognitionListener(this);
         recogIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         recogIntent.putExtra(RecognizerIntent.EXTRA_CONFIDENCE_SCORES, true);
-        if(android.os.Build.VERSION.SDK_INT>=23) //Offline speech has been added in Marshmallow (API 23)
+        //Offline speech has been added in Marshmallow (API 23)
+        if (android.os.Build.VERSION.SDK_INT>=23) {
             recogIntent.putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, offline);
+        }
         recogIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,lang);
         recogIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, lang);
         recogIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, lang);
         recogIntent.putExtra(RecognizerIntent.EXTRA_ONLY_RETURN_LANGUAGE_PREFERENCE, lang);
-        v=view;
-        t=text;
-        debugActive=debug;
-        main=mainActivity;
-        continuousModeActive=mode;
-        pushActive=push;
+        v = view;
+        t = text;
+        debugActive = debug;
+        main = mainActivity;
+        continuousModeActive = mode;
+        pushActive = push;
     }
 
     /**
@@ -68,7 +70,7 @@ public class GoogleSpeechAPI implements RecognitionListener {
      * */
     public void startListening(){
         isEndOfSpeech = false;
-        stop=false;
+        stop = false;
         speech.startListening(recogIntent);
     }
 
@@ -113,77 +115,75 @@ public class GoogleSpeechAPI implements RecognitionListener {
     @Override
     public void onError(int error) {
         //If recognition did not understand or got a timeout, keep going
-        if (!isEndOfSpeech)
+        if (!isEndOfSpeech) {
             return;
+        }
 
-        if(stop)
+        if (stop) {
             return;
+        }
 
-        boolean retry=false;
+        boolean retry = false;
         String errorCode;
 
         switch (error) {
             case SpeechRecognizer.ERROR_AUDIO:
                 Log.d(TAG, "ERROR_AUDIO");
-                errorCode="ERROR_AUDIO";
+                errorCode = "ERROR_AUDIO";
                 break;
             case SpeechRecognizer.ERROR_CLIENT:
                 Log.d(TAG, "ERROR_CLIENT");
-                errorCode="ERROR_CLIENT";
+                errorCode = "ERROR_CLIENT";
                 retry=true;
                 break;
             case SpeechRecognizer.ERROR_RECOGNIZER_BUSY:
                 Log.d(TAG, "ERROR_RECOGNIZER_BUSY");
-                errorCode="ERROR_RECOGNIZER_BUSY";
+                errorCode = "ERROR_RECOGNIZER_BUSY";
                 break;
             case SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS:
                 Log.d(TAG, "ERROR_INSUFFICIENT_PERMISSIONS");
-                errorCode="ERROR_INSUFFICIENT_PERMISSIONS";
+                errorCode = "ERROR_INSUFFICIENT_PERMISSIONS";
                 break;
             case SpeechRecognizer.ERROR_NETWORK_TIMEOUT:
                 Log.d(TAG, "ERROR_NETWORK_TIMEOUT");
-                errorCode="ERROR_NETWORK_TIMEOUT";
+                errorCode = "ERROR_NETWORK_TIMEOUT";
                 break;
             case SpeechRecognizer.ERROR_NETWORK:
                 Log.d(TAG, "ERROR_NETWORK");
-                errorCode="ERROR_NETWORK";
+                errorCode = "ERROR_NETWORK";
                 break;
             case SpeechRecognizer.ERROR_SERVER:
                 Log.d(TAG, "ERROR_SERVER");
-                errorCode="ERROR_SERVER";
+                errorCode = "ERROR_SERVER";
                 break;
             case SpeechRecognizer.ERROR_NO_MATCH:
                 Log.d(TAG, "ERROR_NO_MATCH");
-                errorCode="ERROR_NO_MATCH";
+                errorCode = "ERROR_NO_MATCH";
                 retry=true;
                 break;
             case SpeechRecognizer.ERROR_SPEECH_TIMEOUT:
                 Log.d(TAG, "ERROR_SPEECH_TIMEOUT");
-                errorCode="ERROR_SPEECH_TIMEOUT";
+                errorCode = "ERROR_SPEECH_TIMEOUT";
                 retry=true;
                 break;
             default:
                 return;
         }
-
-        if(debugActive && !retry)
-            Snackbar.make(v, "Error in google speech API: "+errorCode, Snackbar.LENGTH_LONG).setAction("Action", null).show();
-
+        if (debugActive && !retry) {
+            Snackbar.make(v, "Error in google speech API: " + errorCode, Snackbar.LENGTH_LONG).setAction("Action", null).show();
+        }
         speech.cancel();
-
-
-        if((continuousModeActive || pushActive==false) && retry) {
+        if ((continuousModeActive || pushActive==false) && retry) {
             startListening();
-                //main.speechSwitch();
         }
     }
 
     /**
      * Function that stops the Google Speech Listener (but does not destroy it, so it is possible to start the Listener again)
      * */
-    public void bruteForceStop() //In case of error loop
-    {
-        stop=true;
+    public void bruteForceStop() {
+        //In case of error loop
+        stop = true;
         speech.cancel();
     }
 
@@ -196,28 +196,23 @@ public class GoogleSpeechAPI implements RecognitionListener {
      * */
     @Override
     public void onResults(Bundle results) {
-        ArrayList<String> matches = results
-                .getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-        float[] confidence = results
-                .getFloatArray(SpeechRecognizer.CONFIDENCE_SCORES);
+        ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+        float[] confidence = results.getFloatArray(SpeechRecognizer.CONFIDENCE_SCORES);
         speech.cancel();
-
         /*Show on screen the most probable detection*/
         String currentString = t.getText().toString();
-        if(currentString.equals(""))
+        if (currentString.equals("")) {
             t.setText(matches.get(0));
-        else
-            t.setText(currentString+"\n"+matches.get(0));
+        } else {
+            t.setText(currentString + "\n" + matches.get(0));
+        }
 
         /*Send json formatted data to computer/robot if connected and if we have any hypotesis*/
-        if(!matches.get(0).equals(null) && !matches.get(0).equals(""))
-        {
+        if (!matches.get(0).equals(null) && !matches.get(0).equals("")) {
             String hypoToSend = "{\"hypotheses\":[";
-            String hypoResults = "";
             String hypo;
             for (int i = 0; i < matches.size(); i++) {
                 hypo = matches.get(i);
-                hypoResults += hypo + "\n";
                 hypoToSend += "{\"transcription\":\"" + hypo + "\",\"confidence\":"+ confidence[i] +",\"rank\":"+i+"}";
                 if (i != matches.size() - 1) {
                     hypoToSend += ",";
@@ -229,17 +224,18 @@ public class GoogleSpeechAPI implements RecognitionListener {
                 ((MainActivity) main.getActivity()).getClient().send(hypoToSend);
 
         }
-
-        if(stop)
+        if (stop) {
             return;
-
+        }
         //if we did not hear anything try again?
-        if(continuousModeActive && (matches.get(0).equals(null) || matches.get(0).equals("")))
+        if (continuousModeActive && (matches.get(0).equals(null) || matches.get(0).equals(""))) {
             startListening();
-        else if(continuousModeActive)//if we have pocketsphinx in the loop, go back to pocket after the first result
+        } else if (continuousModeActive) {
+            //if we have pocketsphinx in the loop, go back to pocket after the first result
             main.speechSwitch();
-        else if(pushActive==false)
+        } else if (pushActive == false) {
             startListening();
+        }
     }
 
     /**

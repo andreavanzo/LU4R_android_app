@@ -45,7 +45,7 @@
             <SwitchPreference
                 android:defaultValue="true"
                 android:key="push_settings"
-                android:summary="If true, push to talk is enabled, otherwise it is necessary to click the button once to start, and once to stop the recording."
+                android:summary="If true, long-press to talk is enabled, otherwise it is necessary to click the button to start listening, and again to stop."
                 android:title="Push/Click"
                 android:dependency="continuous_speech" />
             <SwitchPreference

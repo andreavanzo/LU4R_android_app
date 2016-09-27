@@ -23,8 +23,6 @@ import java.util.Locale;
 
 import it.uniroma1.android.R;
 import it.uniroma1.android.connectivity.TCPConnectionService;
-import it.uniroma1.android.fragments.AvatarFragment;
-import it.uniroma1.android.fragments.DialogueInterfaceFragment;
 import it.uniroma1.android.fragments.JoypadFragment;
 import it.uniroma1.android.fragments.NavigationDrawerFragment;
 import it.uniroma1.android.fragments.HomeFragment;
@@ -55,6 +53,7 @@ public class MainActivity extends FragmentActivity implements NavigationDrawerFr
     private static boolean offlinePref = true;
     private static boolean logRecord = false;
     private static boolean debugEnabled = false;
+    private String sentenceTTSExample = "This is an example of speech synthesis in English";
     protected PowerManager.WakeLock mWakeLock;
 
     /**
@@ -69,8 +68,9 @@ public class MainActivity extends FragmentActivity implements NavigationDrawerFr
         StrictMode.setThreadPolicy(policy);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        if (connectionType.equals("wifi") && client == null)
+        if (connectionType.equals("wifi") && client == null) {
             client = new TCPConnectionService();
+        }
         setContentView(R.layout.activity_main);
 
         //Init preferences
@@ -132,19 +132,8 @@ public class MainActivity extends FragmentActivity implements NavigationDrawerFr
                 //SpeechInterface
                 frag = SpeechInterfaceFragment.newInstance(position + 1);
                 sectionName = getString(R.string.title_section3);
-                activeFragment = "$SPE";
+                activeFragment = "$SLU";
                 break;
-            /*case 3:
-                //DialogueInterface
-                frag = DialogueInterfaceFragment.newInstance(position + 1);
-                sectionName = getString(R.string.title_section4);
-                activeFragment = "$DIA";
-                break;
-            case 4:
-                frag = AvatarFragment.newInstance(position + 1);
-                sectionName = getString(R.string.title_section7);
-                activeFragment = "$AVA";
-                break;*/
         }
         fragmentTransaction.replace(R.id.container, frag, activeFragment);
         fragmentTransaction.commit();
@@ -162,12 +151,6 @@ public class MainActivity extends FragmentActivity implements NavigationDrawerFr
             case 3:
                 mTitle = getString(R.string.title_section3);
                 break;
-            /*case 4:
-                mTitle = getString(R.string.title_section4);
-                break;
-            case 5:
-                mTitle = getString(R.string.title_section7);
-                break;*/
         }
     }
 
@@ -195,9 +178,6 @@ public class MainActivity extends FragmentActivity implements NavigationDrawerFr
             mNavigationDrawerFragment = (NavigationDrawerFragment) getFragmentManager().findFragmentById(R.id.navigation_drawer);
         }
         if (!mNavigationDrawerFragment.isDrawerOpen()) {
-            // Only show items in the action bar relevant to this screen
-            // if the drawer is not showing. Otherwise, let the drawer
-            // decide what to show in the action bar.
             getMenuInflater().inflate(R.menu.main, menu);
             restoreActionBar();
             return true;
@@ -236,10 +216,8 @@ public class MainActivity extends FragmentActivity implements NavigationDrawerFr
         ip_address = sharedPref.getString("ip_address", "127.0.0.1");
         port = Integer.parseInt(sharedPref.getString("port", "4567"));
         connectionType = sharedPref.getString("connection", "wifi");
-
         continuousActive = sharedPref.getBoolean("continuous_speech", true);
         push = sharedPref.getBoolean("push_settings", true);
-
         String tempLanguage = sharedPref.getString("speech_language", "default");
         if (tempLanguage.equals("default"))
             sttLanguage = Locale.getDefault();
@@ -285,17 +263,42 @@ public class MainActivity extends FragmentActivity implements NavigationDrawerFr
                 break;
             case "speech_language":
                 String tempLanguage = sharedPref.getString(key, "default");
-                if (tempLanguage.equals("default"))
+                if (tempLanguage.equals("default")) {
                     sttLanguage = Locale.getDefault();
-                else
+                } else {
                     sttLanguage = new Locale(tempLanguage);
+                }
                 break;
             case "tts_language":
                 ttsLanguage = sharedPref.getString(key, "default");
-                if (ttsLanguage.equals("default"))
+                if (ttsLanguage.equals("default")) {
                     tts.setLanguage(Locale.getDefault());
-                else
+                } else {
                     tts.setLanguage(new Locale(ttsLanguage));
+                    switch(ttsLanguage) {
+                        case "default":
+                            sentenceTTSExample = getString(R.string.ex_en);
+                            break;
+                        case "en_UK":
+                            sentenceTTSExample = getString(R.string.ex_en);
+                            break;
+                        case "en_US":
+                            sentenceTTSExample = getString(R.string.ex_en);
+                            break;
+                        case "it":
+                            sentenceTTSExample = getString(R.string.ex_it);
+                            break;
+                        case "fr":
+                            sentenceTTSExample = getString(R.string.ex_fr);
+                            break;
+                        case "es":
+                            sentenceTTSExample = getString(R.string.ex_es);
+                            break;
+                        case "de":
+                            sentenceTTSExample = getString(R.string.ex_de);
+                            break;
+                    }
+                }
                 break;
             case "offline_speech":
                 offlinePref = sharedPref.getBoolean(key, true);
@@ -313,13 +316,13 @@ public class MainActivity extends FragmentActivity implements NavigationDrawerFr
                 float newPitch = ((float)sharedPref.getInt("pitchSeekBar", 1)) / 10.0f;
                 tts.setPitch(newPitch);
                 Toast.makeText(getApplicationContext(), "Pitch: " + newPitch, Toast.LENGTH_SHORT).show();
-                tts.speak("Questa è una prova", TextToSpeech.QUEUE_FLUSH, null, null);
+                tts.speak(sentenceTTSExample, TextToSpeech.QUEUE_FLUSH, null, null);
                 break;
             case "rateSeekBar":
                 float newRate = ((float)sharedPref.getInt("rateSeekBar", 1)) / 10.0f;
                 tts.setSpeechRate(newRate);
                 Toast.makeText(getApplicationContext(), "Rate: " + newRate, Toast.LENGTH_SHORT).show();
-                tts.speak("Questa è una prova", TextToSpeech.QUEUE_FLUSH, null, null);
+                tts.speak(sentenceTTSExample, TextToSpeech.QUEUE_FLUSH, null, null);
                 break;
         }
     }
@@ -327,10 +330,6 @@ public class MainActivity extends FragmentActivity implements NavigationDrawerFr
     public static TCPConnectionService getClient() {
         return client;
     }
-
-    /*public BluetoothConnectionService getBluetoothConnectionService() {
-        return bcs;
-    }*/
 
     public String getIpAddress() {
         return ip_address;
@@ -375,7 +374,6 @@ public class MainActivity extends FragmentActivity implements NavigationDrawerFr
     public Locale getSpeechLanguage() {
         return sttLanguage;
     }
-
 
     public String getActiveFragmentString() {
         return activeFragment;

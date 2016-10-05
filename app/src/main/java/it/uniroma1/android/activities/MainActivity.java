@@ -314,13 +314,13 @@ public class MainActivity extends FragmentActivity implements NavigationDrawerFr
                 float newPitch = ((float)sharedPref.getInt("pitchSeekBar", 1)) / 10.0f;
                 tts.setPitch(newPitch);
                 Toast.makeText(getApplicationContext(), "Pitch: " + newPitch, Toast.LENGTH_SHORT).show();
-                tts.speak("Questa è una prova", TextToSpeech.QUEUE_FLUSH, null, null);
+                tts.speak("Ciao sono Martina! Queste sono le fedi! Auguri Sara e Francesco!", TextToSpeech.QUEUE_FLUSH, null, null);
                 break;
             case "rateSeekBar":
                 float newRate = ((float)sharedPref.getInt("rateSeekBar", 1)) / 10.0f;
                 tts.setSpeechRate(newRate);
                 Toast.makeText(getApplicationContext(), "Rate: " + newRate, Toast.LENGTH_SHORT).show();
-                tts.speak("Questa è una prova", TextToSpeech.QUEUE_FLUSH, null, null);
+                tts.speak("Ciao sono Martina! Queste sono le fedi! Auguri Sara e Francesco!", TextToSpeech.QUEUE_FLUSH, null, null);
                 break;
         }
     }

@@ -1,17 +1,22 @@
 package it.uniroma1.android.activities;
 
+import android.Manifest;
 import android.app.ActionBar;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
 import android.view.Menu;
@@ -19,6 +24,8 @@ import android.view.MenuItem;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import it.uniroma1.android.R;
@@ -42,6 +49,7 @@ public class MainActivity extends FragmentActivity implements NavigationDrawerFr
     private PreferenceChangeListener mPreferenceListener = null;
     private static String ip_address = "127.0.0.1";
     private static int port = 4567;
+    private static String joyParamSeparator = " ";
     private static Locale sttLanguage = Locale.getDefault();
     private static String ttsLanguage = Locale.getDefault().toString();
     private static TextToSpeech tts = null;
@@ -55,6 +63,8 @@ public class MainActivity extends FragmentActivity implements NavigationDrawerFr
     private static boolean debugEnabled = false;
     private String sentenceTTSExample = "This is an example of speech synthesis in English";
     protected PowerManager.WakeLock mWakeLock;
+
+    final private int REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS = 124;
 
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
@@ -94,6 +104,9 @@ public class MainActivity extends FragmentActivity implements NavigationDrawerFr
             tts.setSpeechRate(2.0f);
             tts.setPitch(1.8f);
         }
+
+        requestPermissions();
+
         final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         this.mWakeLock = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "My Tag");
         this.mWakeLock.acquire();
@@ -216,18 +229,21 @@ public class MainActivity extends FragmentActivity implements NavigationDrawerFr
         ip_address = sharedPref.getString("ip_address", "127.0.0.1");
         port = Integer.parseInt(sharedPref.getString("port", "4567"));
         connectionType = sharedPref.getString("connection", "wifi");
+        joyParamSeparator = sharedPref.getString("joy_params", " ");
         continuousActive = sharedPref.getBoolean("continuous_speech", true);
         push = sharedPref.getBoolean("push_settings", true);
         String tempLanguage = sharedPref.getString("speech_language", "default");
-        if (tempLanguage.equals("default"))
+        if (tempLanguage.equals("default")) {
             sttLanguage = Locale.getDefault();
-        else
+        } else {
             sttLanguage = new Locale(tempLanguage);
+        }
         tempLanguage = sharedPref.getString("tts_language", "default");
-        if (tempLanguage.equals("default"))
+        if (tempLanguage.equals("default")) {
             tts.setLanguage(Locale.getDefault());
-        else
+        } else {
             tts.setLanguage(new Locale(tempLanguage));
+        }
         offlinePref = sharedPref.getBoolean("offline_speech", true);
         wifiOnly = sharedPref.getBoolean("wifi_speech", true);
         debugEnabled = sharedPref.getBoolean("debug_speech", false);
@@ -248,6 +264,9 @@ public class MainActivity extends FragmentActivity implements NavigationDrawerFr
                 break;
             case "connection":
                 connectionType = sharedPref.getString(key, "wifi");
+                break;
+            case "joy_params":
+                joyParamSeparator = sharedPref.getString(key, " ");
                 break;
             case "continuous_speech":
                 continuousActive = sharedPref.getBoolean(key, true);
@@ -327,6 +346,56 @@ public class MainActivity extends FragmentActivity implements NavigationDrawerFr
         }
     }
 
+    public void requestPermissions() {
+        List<String> permissionsNeeded = new ArrayList<String>();
+
+        final List<String> permissionsList = new ArrayList<String>();
+        if (!addPermission(permissionsList, Manifest.permission.RECORD_AUDIO))
+            permissionsNeeded.add("Microphone");
+        if (!addPermission(permissionsList, Manifest.permission.WRITE_EXTERNAL_STORAGE))
+            permissionsNeeded.add("Write External Storage");
+
+        if (permissionsList.size() > 0) {
+            if (permissionsNeeded.size() > 0) {
+                // Need Rationale
+                String message = "You need to grant access to " + permissionsNeeded.get(0);
+                for (int i = 1; i < permissionsNeeded.size(); i++)
+                    message = message + ", " + permissionsNeeded.get(i);
+                showMessageOKCancel(message,
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                ActivityCompat.requestPermissions(MainActivity.this, permissionsList.toArray(new String[permissionsList.size()]),
+                                        REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
+                            }
+                        });
+                return;
+            }
+            ActivityCompat.requestPermissions(MainActivity.this, permissionsList.toArray(new String[permissionsList.size()]),
+                    REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
+            return;
+        }
+    }
+
+    private boolean addPermission(List<String> permissionsList, String permission) {
+        if (ActivityCompat.checkSelfPermission(MainActivity.this, permission) != PackageManager.PERMISSION_GRANTED) {
+            permissionsList.add(permission);
+            // Check for Rationale Option
+            if (!ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, permission))
+                return false;
+        }
+        return true;
+    }
+
+    private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
+        new AlertDialog.Builder(MainActivity.this)
+                .setMessage(message)
+                .setPositiveButton("OK", okListener)
+                .setNegativeButton("Cancel", null)
+                .create()
+                .show();
+    }
+
     public static TCPConnectionService getClient() {
         return client;
     }
@@ -341,6 +410,10 @@ public class MainActivity extends FragmentActivity implements NavigationDrawerFr
 
     public String getConnectionType() {
         return connectionType;
+    }
+
+    public String getJoyParamSeparator() {
+        return joyParamSeparator;
     }
 
     public boolean getContinuousActive() {

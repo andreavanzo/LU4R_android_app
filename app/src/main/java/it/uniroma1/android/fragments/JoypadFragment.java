@@ -21,6 +21,7 @@ public class JoypadFragment extends Fragment {
     private RelativeLayout layout_joystick;
     private TextView xTextView, yTextView, angleTextView, distanceTextView, normDistanceTextView, directionTextView;
 
+
     public static JoypadFragment newInstance(int sectionNumber) {
         JoypadFragment fragment = new JoypadFragment();
         Bundle args = new Bundle();
@@ -105,7 +106,7 @@ public class JoypadFragment extends Fragment {
                     directionTextView.setText("Direction :");
                 }
                 if (((MainActivity) getActivity()).getClient().isConnected()) {
-                    ((MainActivity) getActivity()).getClient().send(js.getNormalizedDistance() + " " + js.getAngle());
+                    ((MainActivity) getActivity()).getClient().send(js.getNormalizedDistance() + ((MainActivity) getActivity()).getJoyParamSeparator() + js.getAngle());
                 }
 
                 return true;

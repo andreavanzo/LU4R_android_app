@@ -19,6 +19,7 @@ public class TCPConnectionService extends AsyncTask<Void, Void, Void> {
     private PrintWriter out = null;
     private boolean isConnected = false;
     private KeepAwakeThread kat;
+    private ResponseHandlerThread lt = null;
 
 
 
@@ -29,7 +30,7 @@ public class TCPConnectionService extends AsyncTask<Void, Void, Void> {
     public boolean connect(String addr, int port) {
 
         try {
-            if (isConnected){
+            if (isConnected) {
                 return true;
             } else {
                 clientSocket = new Socket();
@@ -38,6 +39,8 @@ public class TCPConnectionService extends AsyncTask<Void, Void, Void> {
                 isConnected = true;
                 kat = new KeepAwakeThread();
                 kat.start();
+                lt = new ResponseHandlerThread();
+                lt.run();
                 return true;
             }
         } catch (IOException e) {
@@ -48,19 +51,21 @@ public class TCPConnectionService extends AsyncTask<Void, Void, Void> {
     }
 
     public boolean disconnect() {
-        if (clientSocket != null && clientSocket.isConnected())
+        if (clientSocket != null && clientSocket.isConnected()) {
             try {
                 clientSocket.close();
                 isConnected = false;
                 kat.terminate();
+                //lt.terminate();
                 return true;
             } catch (IOException e) {
                 e.printStackTrace();
                 isConnected = false;
                 return false;
             }
-        else
+        } else {
             return false;
+        }
     }
 
     @Override

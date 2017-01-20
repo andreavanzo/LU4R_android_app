@@ -29,6 +29,12 @@
     <PreferenceScreen
         android:title="@string/joyPreferences"
         android:key="joypadPreferences">
+        <ListPreference
+            android:defaultValue="Empty space"
+            android:entries="@array/joy_params_separator_array"
+            android:entryValues="@array/joy_params_separator_values"
+            android:key="joy_params"
+            android:title="Parameters separator" />
     </PreferenceScreen>
     <PreferenceScreen
         android:title="@string/sttPreferences"

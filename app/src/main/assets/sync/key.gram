@@ -1,7 +1,1 @@
-up /1e-1/
-down /1e-8/
-left /1e-8/
-right /1e-10/
-forwards /1e-10/
-backwards /1e-10/
-ok robot /1e-45/
+ok robot /1e-20/
